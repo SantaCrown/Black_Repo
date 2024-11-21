@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import process from 'process';
 import passport from 'passport';
 import validator from 'validator'; // Install this package using: npm install validator
+
 import User from '../models/User.js';
 
 const router = express.Router();
@@ -68,9 +69,10 @@ router.get(
     console.log('Google callback hit');
     next();
   },
-  passport.authenticate('google', { failureRedirect: '/login', failureFlash: true }),
+  passport.authenticate('google', { failureRedirect: '/login'}),
   (req, res) => {
-    res.redirect('http://localhost:3000/');
+    const token = jwt.sign({ userId: req.user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.redirect(`http://localhost:3000/dashboard?token=${token}`);
   }
 );
 
