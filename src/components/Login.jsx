@@ -2,26 +2,33 @@ import { useState } from 'react';
 import axios from 'axios';
 
 function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [form, setForm] = useState({ email: '', password: '' });
 
-  const handleLogin = async (e) => {
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/auth/login', { email, password });
-      localStorage.setItem('token', response.data.token);
-      alert('Login successful!');
-    } catch (error) {
-      alert(error.response?.data?.error || 'Something went wrong');
+      const { data } = await axios.post('http://localhost:5000/auth/login', form);
+      localStorage.setItem('token', data.token);
+      window.location.href = '/dashboard';
+    } catch (err) {
+      alert(err.response?.data?.error || 'Login failed');
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:5000/auth/google';
+  };
+
   return (
-    <form onSubmit={handleLogin}>
-      <h2>Login</h2>
-      <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-      <button type="submit">Login</button>
+    <form onSubmit={handleSubmit}>
+      <input name="email" placeholder="Email" value={form.email} onChange={handleChange} required />
+      <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} required />
+      <button type="submit">Log In</button>
+      <button type="button" onClick={handleGoogleLogin}>Log In with Google</button>
     </form>
   );
 }
