@@ -15,8 +15,9 @@ function Login() {
     e.preventDefault();
     try {
       const { data } = await axios.post('http://localhost:5000/auth/login', form);
+      console.log("token-->", data.token)
       localStorage.setItem('token', data.token);
-      window.location.href = '/dashboard'; // Redirect after login
+      window.location.href = '/'; // Redirect after login
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed');
     }
@@ -28,7 +29,7 @@ function Login() {
 
   return (
     <Container maxWidth="xs">
-      <Box sx={{ mt: 8, textAlign: 'center' }}>
+      <Box sx={{ mt: 8, textAlign: 'center', backgroundColor: 'white', padding: '2rem 1rem', borderRadius: '1rem' }}>
         <Typography variant="h4" component="h1" gutterBottom>
           Login
         </Typography>

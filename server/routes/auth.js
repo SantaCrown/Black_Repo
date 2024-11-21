@@ -70,7 +70,7 @@ router.get(
   },
   passport.authenticate('google', { failureRedirect: '/login', failureFlash: true }),
   (req, res) => {
-    res.redirect('http://localhost:3000/dashboard');
+    res.redirect('http://localhost:3000/');
   }
 );
 

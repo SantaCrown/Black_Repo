@@ -18,6 +18,7 @@ function Signup() {
       const response = await axios.post('http://localhost:5000/auth/signup', form);
       setSuccess(response.data.message);
       setError('');
+      window.location.href = '/login'; // Redirect after login
     } catch (err) {
       setError(err.response?.data?.error || 'Signup failed');
       setSuccess('');
@@ -26,7 +27,7 @@ function Signup() {
 
   return (
     <Container maxWidth="xs">
-      <Box sx={{ mt: 8, textAlign: 'center' }}>
+      <Box sx={{ mt: 8, textAlign: 'center', backgroundColor: 'white', padding: '2rem 1rem', borderRadius: '1rem' }}>
         <Typography variant="h4" component="h1" gutterBottom>
           Sign Up
         </Typography>
