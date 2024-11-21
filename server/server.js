@@ -15,7 +15,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(session({ secret: 'your_session_secret', resave: false, saveUninitialized: true }));
+app.use(session({ secret: 'blacklemon', resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 

@@ -39,6 +39,10 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 
 router.get(
   '/google/callback',
+  (req, res, next) => {
+    console.log('Google callback hit');
+    next();
+  },
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
     res.redirect('http://localhost:3000/dashboard');
