@@ -1,26 +1,29 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 function Signup() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
 
-  const handleSignup = async (e) => {
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/auth/signup', { email, password });
-      alert(response.data.message);
-    } catch (error) {
-      alert(error.response?.data?.error || 'Something went wrong');
+      await axios.post('http://localhost:5000/auth/signup', form);
+      alert('Signup successful!');
+    } catch (err) {
+      alert(err.response?.data?.error || 'Signup failed');
     }
   };
 
   return (
-    <form onSubmit={handleSignup}>
-      <h2>Signup</h2>
-      <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-      <button type="submit">Signup</button>
+    <form onSubmit={handleSubmit}>
+      <input name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
+      <input name="email" placeholder="Email" value={form.email} onChange={handleChange} required />
+      <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} required />
+      <button type="submit">Sign Up</button>
     </form>
   );
 }
