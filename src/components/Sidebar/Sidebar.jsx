@@ -6,23 +6,23 @@ import {
   Market,
   Setting,
 } from "../../icons/icons";
-function Sidebar({menuState}) {
+function Sidebar({ menuState }) {
   const IconStratiges = StatigesIcon;
   const sideMenu = [
-   
+
     {
       name: "Dashboard",
       icon: <HomeIcon />,
-      link: "/",
+      link: "/dashboard",
     },
     {
       name: "🔑 Credentials",
-     
+
       link: "/credentials",
     },
     {
       name: "👨‍🏫 PMM Simple",
-     
+
       link: "/ppm-simple",
     },
     {
@@ -54,7 +54,7 @@ function Sidebar({menuState}) {
     },
   ];
   return (
-    <div className={`side-bar ${menuState ? "open" :''}`}>
+    <div className={`side-bar ${menuState ? "open" : ''}`}>
       <ul>
         {sideMenu.map((ele, ind) =>
           !ele?.submenu ? (
@@ -72,9 +72,9 @@ function Sidebar({menuState}) {
                   {ele.name}
                 </NavLink>
                 <ul className="sub-menu">
-                  {ele?.submenu.map((eleSub , index) => (
+                  {ele?.submenu.map((eleSub, index) => (
                     <li key={index}>
-                    
+
                       <NavLink to={eleSub.link}>{eleSub.name}</NavLink>
                     </li>
                   ))}

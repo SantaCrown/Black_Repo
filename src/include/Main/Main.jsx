@@ -26,11 +26,9 @@ function Main({ menuState }) {
             {/* Protected Routes */}
             <Route
               exact
-              path="/"
+              path="/dashboard"
               element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
+                <Dashboard />
               }
             />
             <Route
