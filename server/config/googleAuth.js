@@ -16,13 +16,26 @@ passport.use(
     async (accessToken, refreshToken, profile, done) => {
       try {
         let user = await User.findOne({ googleId: profile.id });
+
+        // If no user found with googleId, check if email exists
         if (!user) {
-          user = await User.create({
-            googleId: profile.id,
-            email: profile.emails[0].value,
-            name: profile.displayName,
-          });
+          user = await User.findOne({ email: profile.emails[0].value });
+
+          if (user) {
+            // Update user with googleId if they signed up with email/password before
+            user.googleId = profile.id;
+            await user.save();
+          } else {
+            // Create a new user if not found
+            user = new User({
+              googleId: profile.id,
+              email: profile.emails[0].value,
+              name: profile.displayName,
+            });
+            await user.save();
+          }
         }
+
         done(null, user);
       } catch (err) {
         done(err, null);
@@ -30,6 +43,7 @@ passport.use(
     }
   )
 );
+
 
 // Serialize user
 passport.serializeUser((user, done) => {

@@ -10,14 +10,25 @@ const router = express.Router();
 // Local Signup
 router.post('/signup', async (req, res) => {
   const { name, email, password } = req.body;
+
   try {
+    // Check if the email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email is already in use.' });
+    }
+
+    // Create a new user
     const user = new User({ name, email, password });
     await user.save();
+
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 // Local Login
 router.post('/login', async (req, res) => {
@@ -43,7 +54,7 @@ router.get(
     console.log('Google callback hit');
     next();
   },
-  passport.authenticate('google', { failureRedirect: '/login' }),
+  passport.authenticate('google', { failureRedirect: '/login', failureFlash: true }),
   (req, res) => {
     res.redirect('http://localhost:3000/dashboard');
   }
