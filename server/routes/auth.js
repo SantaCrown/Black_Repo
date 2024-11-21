@@ -44,6 +44,9 @@ router.post('/signup', async (req, res) => {
 // Local Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required.' });
+  }
   try {
     const user = await User.findOne({ email });
     if (!user || !(await user.comparePassword(password))) {
