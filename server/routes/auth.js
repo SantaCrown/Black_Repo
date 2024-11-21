@@ -61,7 +61,14 @@ router.post('/login', async (req, res) => {
 });
 
 // Google Login
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get(
+  '/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    prompt: 'select_account', // Forces the "Choose an Account" screen
+  })
+);
+
 
 router.get(
   '/google/callback',
