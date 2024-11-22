@@ -15,6 +15,13 @@ function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if passwords match
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords don't match!");
+      return;
+    }
+
     try {
       const response = await axios.post('http://localhost:5000/auth/signup', form);
       setSuccess(response.data.message);
@@ -64,6 +71,16 @@ function Signup() {
             fullWidth
             margin="normal"
             value={form.password}
+            onChange={handleChange}
+            required
+          />
+          <TextField
+            name="confirmPassword"
+            type="password"
+            label="Re-enter Password"
+            fullWidth
+            margin="normal"
+            value={form.confirmPassword}
             onChange={handleChange}
             required
           />
