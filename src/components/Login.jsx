@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { TextField, Button, Typography, Box, Container } from '@mui/material';
+import { NavLink } from 'react-router-dom';
 
 function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -70,6 +71,9 @@ function Login() {
         >
           Log In with Google
         </Button>
+
+        <p className='singupNow'>Don&apos;t have an account yet? <b> <NavLink to="/signup">Sign Up</NavLink></b> </p>
+
       </Box>
     </Container>
   );
