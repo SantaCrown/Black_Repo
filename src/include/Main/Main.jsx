@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import Dashboard from "../../pages/Dashboard";
 import Strategies from '../../pages/Strategies';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Bots from '../../pages/bots';
 import BotName from '../../pages/BotName';
 import Credentials from '../../pages/Credentials';
@@ -98,6 +98,9 @@ function Main({ menuState }) {
                 </ProtectedRoute>
               }
             />
+
+            <Route path="*" element={<Navigate to="/login" />} />
+
           </Routes>
         </div>
       </BrowserRouter>
