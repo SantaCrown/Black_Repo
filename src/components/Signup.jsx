@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { TextField, Button, Typography, Box, Container } from '@mui/material';
-
+import { TextField, Typography, Box, Container } from '@mui/material';
+import { BrowserRouter as Router, Link, NavLink } from "react-router-dom";
+import Button from "../uielement/Button";
 function Signup() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
@@ -26,8 +27,9 @@ function Signup() {
   };
 
   return (
-    <Container maxWidth="xs">
-      <Box sx={{ mt: 8, textAlign: 'center', backgroundColor: 'white', padding: '2rem 1rem', borderRadius: '1rem' }}>
+    <div className='login-singup-page'>
+    <Container className='login-singup-page-container' maxWidth="xs">
+      <Box sx={{ mt: 8, textAlign: 'center' }}>
         <Typography variant="h4" component="h1" gutterBottom>
           Sign Up
         </Typography>
@@ -62,17 +64,18 @@ function Signup() {
             onChange={handleChange}
             required
           />
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            sx={{ mt: 3 }}
-          >
+       <Button  type="submit"  buttonType="link" className="default-btn singup-btn">
+           
+        
             Sign Up
           </Button>
+          <br/>
+          <p className='singupNow'>Already have an account yet? <b> <NavLink to="/login">Login Now</NavLink></b> </p>
+
         </Box>
       </Box>
     </Container>
+    </div>
   );
 }
 
