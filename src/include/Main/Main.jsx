@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import Dashboard from "../../pages/Dashboard";
 import Strategies from '../../pages/Strategies';
@@ -13,6 +13,23 @@ import Login from '../../components/Login';
 import ProtectedRoute from '../../components/ProtectedRoute ';
 
 function Main({ menuState }) {
+  // Manage login state
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+
+  // Monitor `localStorage` for changes to the token
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsLoggedIn(!!localStorage.getItem('token'));
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+  console.log("isLoggedIn==>", isLoggedIn)
+
   return (
     <main>
       <BrowserRouter>

@@ -3,13 +3,39 @@ import Notes from "../components/Notes/Notes";
 import { Info, Eth, Tether, Sui, Aptus } from "../icons/icons";
 import Button from "../uielement/Button";
 import CandleChart from "../components/CandleChart/CandleChart";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 function Dashboard() {
   const InfoIco = Info;
   const EthIco = Eth;
   const TetherIco = Tether;
   const SuiIco = Sui;
   const AptusIco = Aptus;
+  const navigate = useNavigate();
 
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    // Get token from query params
+    const params = new URLSearchParams(window.location.search);
+    // const token = params.get('token');
+    if (params.get('token')) {
+      setToken(params.get('token'));
+      // Store the token in localStorage
+      localStorage.setItem('token', params.get('token'));
+
+      // Clear the query parameter from the URL
+      window.history.replaceState(null, '', window.location.pathname);
+      window.location.href = '/dashboard'; // Redirect after login
+    } else if (localStorage.getItem('token')) {
+      // navigate('/dashboard')
+      setToken(localStorage.getItem('token'));
+
+    } else {
+      // Redirect to login if token is missing
+      navigate('/login');
+    }
+  }, [navigate, token]);
   return (
     <div>
       <h2 className="heading-top">Dashboard</h2>

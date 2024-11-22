@@ -17,7 +17,7 @@ function Login() {
       const { data } = await axios.post('http://localhost:5000/auth/login', form);
       console.log("token-->", data.token)
       localStorage.setItem('token', data.token);
-      window.location.href = '/'; // Redirect after login
+      window.location.href = '/dashboard'; // Redirect after login
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed');
     }
