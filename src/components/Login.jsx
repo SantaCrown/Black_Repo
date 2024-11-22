@@ -16,6 +16,7 @@ function Login() {
     e.preventDefault();
     try {
       const { data } = await axios.post('http://localhost:5000/auth/login', form);
+      console.log("token-->", data.token)
       localStorage.setItem('token', data.token);
       window.location.href = '/dashboard'; // Redirect after login
     } catch (err) {

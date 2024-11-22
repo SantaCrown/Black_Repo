@@ -19,6 +19,7 @@ function Signup() {
       const response = await axios.post('http://localhost:5000/auth/signup', form);
       setSuccess(response.data.message);
       setError('');
+      window.location.href = '/login'; // Redirect after login
     } catch (err) {
       setError(err.response?.data?.error || 'Signup failed');
       setSuccess('');

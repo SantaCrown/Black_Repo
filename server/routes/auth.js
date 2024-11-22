@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import process from 'process';
 import passport from 'passport';
 import validator from 'validator'; // Install this package using: npm install validator
+
 import User from '../models/User.js';
 
 const router = express.Router();
@@ -44,6 +45,9 @@ router.post('/signup', async (req, res) => {
 // Local Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required.' });
+  }
   try {
     const user = await User.findOne({ email });
     if (!user || !(await user.comparePassword(password))) {
@@ -57,7 +61,14 @@ router.post('/login', async (req, res) => {
 });
 
 // Google Login
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get(
+  '/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    prompt: 'select_account', // Forces the "Choose an Account" screen
+  })
+);
+
 
 router.get(
   '/google/callback',
@@ -65,9 +76,10 @@ router.get(
     console.log('Google callback hit');
     next();
   },
-  passport.authenticate('google', { failureRedirect: '/login', failureFlash: true }),
+  passport.authenticate('google', { failureRedirect: '/login'}),
   (req, res) => {
-    res.redirect('http://localhost:3000/dashboard');
+    const token = jwt.sign({ userId: req.user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.redirect(`http://localhost:3000/dashboard?token=${token}`);
   }
 );
 
