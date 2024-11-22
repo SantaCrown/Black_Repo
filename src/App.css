@@ -123,6 +123,86 @@ main {
   gap: 15px;
   
 }
+.login-singup-page {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: rgba(0, 0, 0, .8);
+}
+.login-singup-page-container {
+  background: #141414;
+  padding: 20px;
+  border-radius: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+ 
+  transform: translate(-50%,-50%);
+}
+.login-singup-page-container .MuiBox-root {
+  margin: 0;
+  background: #141414;
+}
+.login-singup-page-container .MuiBox-root h1 {
+  color: #ffffff;
+}
+.login-singup-page-container .MuiInputBase-root input,.MuiInputBase-root input:focus {
+  background: none;
+  outline: 3px yellow solid;
+  background: none !important;
+  background-color: #000000 !important;
+  border-radius: 10px;
+  color: #ffffff
+}
+.login-singup-page-container .MuiInputBase-root input,.MuiInputBase-root input:-internal-autofill-selected  {
+  background-color: #000000 !important;
+}
+.login-singup-page-container .MuiBox-root .MuiFormLabel-filled  {
+  color: yellow;
+  padding: 10px;
+  border-radius: 10px;
+top: -10px;
+background: #141414;
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #ffffff;
+    transition: background-color 5000s ease-in-out 0s;
+    box-shadow: inset 0 0 20px 20px #23232329;
+}
+.login-singup-page-container .MuiInputBase-root input,.MuiBox-root label {
+  color: yellow;
+  top: -5px;
+}
+.login-singup-page-container .MuiInputBase-root input,.MuiBox-root label.Mui-focused {
+  background: #141414;
+  color: yellow;
+  padding: 15px;
+  border-radius: 10px;
+top: -10px;
+}
+.login-singup-page-container .MuiBox-root .login-btn {
+  margin: 10px 0px;
+}
+.login-singup-page-container .MuiFormControl-root  {
+  margin-top: 30px;
+}
+.singupNow {
+  color: #ffffff;
+}
+.singupNow a {
+  color: yellow;
+}
+.singup-btn {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 100% !important;
+}
 .side-bar {
   width: 20%;
 
@@ -1108,5 +1188,3 @@ header {
   justify-content: center;
 }
   }
-
-
