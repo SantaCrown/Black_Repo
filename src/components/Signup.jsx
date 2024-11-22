@@ -26,6 +26,10 @@ function Signup() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:5000/auth/google';
+  };
+
   return (
     <Container maxWidth="xs">
       <Box sx={{ mt: 8, textAlign: 'center', backgroundColor: 'white', padding: '2rem 1rem', borderRadius: '1rem' }}>
@@ -70,6 +74,14 @@ function Signup() {
             sx={{ mt: 3 }}
           >
             Sign Up
+          </Button>
+          <Button
+            onClick={handleGoogleLogin}
+            variant="outlined"
+            fullWidth
+            sx={{ mt: 2 }}
+          >
+            Sign Up with Google
           </Button>
           <p className='singupNow'>Already have an account yet? <b> <NavLink to="/login">Login Now</NavLink></b> </p>
         </Box>
