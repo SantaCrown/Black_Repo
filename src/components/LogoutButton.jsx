@@ -23,8 +23,6 @@ function LogoutButton() {
     return () => window.removeEventListener('storage', checkLoginStatus);
   }, []);
 
-  console.log("local-->", localStorage.getItem('token'))
-
   // Only render the button if the user is logged in
   if (!localStorage.getItem('token')) {
     return null; // Return nothing if the user is not logged in
