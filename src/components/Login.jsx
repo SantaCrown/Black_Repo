@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { TextField, Typography, Box, Container } from '@mui/material';
+import { NavLink } from 'react-router-dom';
 import Button from "../uielement/Button";
-import { BrowserRouter as Router, Link, NavLink } from "react-router-dom";
 function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -29,47 +29,54 @@ function Login() {
 
   return (
     <div className="login-singup-page">
-    <Container className='login-singup-page-container' maxWidth="xs">
-      <Box sx={{ mt: 8, textAlign: 'center' }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Login
-        </Typography>
-        {error && <Typography color="error">{error}</Typography>}
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-          <TextField
-            name="email"
-            label="Email"
+      <Container className='login-singup-page-container' maxWidth="xs">
+        <Box sx={{ mt: 8 }}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            Login
+          </Typography>
+          {error && <Typography color="error">{error}</Typography>}
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+            <TextField
+              name="email"
+              label="Email"
+              fullWidth
+              margin="normal"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+            <TextField
+              name="password"
+              type="password"
+              label="Password"
+              fullWidth
+              margin="normal"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+            <Button buttonType="button" className="default-btn login-btn"
+              type="submit"
+              variant="contained"
+              fullWidth
+              sx={{ mt: 3 }}
+            >
+              Log In
+            </Button>
+          </Box>
+          <Button buttonType="button" className="default-btn login-btn"
+             handler={handleGoogleLogin}
+            variant="outlined"
             fullWidth
-            margin="normal"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-          <TextField
-            name="password"
-            type="password"
-            label="Password"
-            fullWidth
-            margin="normal"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
-          <Button buttonType="link" className="default-btn login-btn">
-            Log In
+            sx={{ mt: 2 }}
+          >
+            Log In with Google
           </Button>
 
           <p className='singupNow'>Don&apos;t have an account yet? <b> <NavLink to="/signup">Sign Up</NavLink></b> </p>
 
         </Box>
-        <Button handler={handleGoogleLogin} buttonType="link" className="default-btn google-login">
-          
-          Log In with Google
-        </Button>
-        <br/>
-        <p className='singupNow'>Don't have an account yet? <b> <NavLink to="/signup">Sign Up</NavLink></b> </p>
-      </Box>
-    </Container>
+      </Container>
     </div>
   );
 }

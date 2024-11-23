@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { TextField, Typography, Box, Container } from '@mui/material';
-import { BrowserRouter as Router, Link, NavLink } from "react-router-dom";
+import { NavLink } from 'react-router-dom';
 import Button from "../uielement/Button";
 function Signup() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
@@ -38,9 +38,9 @@ function Signup() {
   };
 
   return (
-    <div className='login-singup-page'>
-    <Container className='login-singup-page-container' maxWidth="xs">
-      <Box sx={{ mt: 8, textAlign: 'center' }}>
+    <div className="login-singup-page">
+      <Container className='login-singup-page-container' maxWidth="xs">
+      <Box sx={{ mt: 8}}>
         <Typography variant="h4" component="h1" gutterBottom>
           Sign Up
         </Typography>
@@ -75,14 +75,33 @@ function Signup() {
             onChange={handleChange}
             required
           />
-       <Button  type="submit"  buttonType="link" className="default-btn singup-btn">
-           
-        
+          <TextField
+            name="confirmPassword"
+            type="password"
+            label="Re-enter Password"
+            fullWidth
+            margin="normal"
+            value={form.confirmPassword}
+            onChange={handleChange}
+            required
+          />
+            <Button buttonType="button" className="default-btn login-btn"
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={{ mt: 3 }}
+          >
             Sign Up
           </Button>
-          <br/>
+          <Button buttonType="button" className="default-btn login-btn"
+             handler={handleGoogleLogin}
+            variant="outlined"
+            fullWidth
+            sx={{ mt: 2 }}
+          >
+            Sign Up with Google
+          </Button>
           <p className='singupNow'>Already have an account yet? <b> <NavLink to="/login">Login Now</NavLink></b> </p>
-
         </Box>
       </Box>
     </Container>
