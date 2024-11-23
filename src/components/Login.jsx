@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { TextField, Typography, Box, Container } from '@mui/material';
 import Button from "../uielement/Button";
@@ -16,7 +16,6 @@ function Login() {
     e.preventDefault();
     try {
       const { data } = await axios.post('http://localhost:5000/auth/login', form);
-      console.log("token-->", data.token)
       localStorage.setItem('token', data.token);
       window.location.href = '/dashboard'; // Redirect after login
     } catch (err) {
@@ -59,6 +58,9 @@ function Login() {
           <Button buttonType="link" className="default-btn login-btn">
             Log In
           </Button>
+
+          <p className='singupNow'>Don&apos;t have an account yet? <b> <NavLink to="/signup">Sign Up</NavLink></b> </p>
+
         </Box>
         <Button handler={handleGoogleLogin} buttonType="link" className="default-btn google-login">
           

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { TextField, Typography, Box, Container } from '@mui/material';
 import { BrowserRouter as Router, Link, NavLink } from "react-router-dom";
@@ -15,6 +15,13 @@ function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if passwords match
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords don't match!");
+      return;
+    }
+
     try {
       const response = await axios.post('http://localhost:5000/auth/signup', form);
       setSuccess(response.data.message);
@@ -24,6 +31,10 @@ function Signup() {
       setError(err.response?.data?.error || 'Signup failed');
       setSuccess('');
     }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:5000/auth/google';
   };
 
   return (
