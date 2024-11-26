@@ -6,6 +6,7 @@ import passport from 'passport';
 import session from 'express-session';
 import process from 'process';
 import authRoutes from './routes/auth.js';
+import mainRoutes from './routes/main.js'
 import './config/googleAuth.js'; // Google OAuth config
 
 dotenv.config();
@@ -21,6 +22,8 @@ app.use(passport.session());
 
 // Routes
 app.use('/auth', authRoutes);
+// app.use('/add-account', accountRoutes)
+app.use('/api', mainRoutes)
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)

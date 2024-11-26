@@ -1,6 +1,6 @@
 // src/services/apiService.js
 import axiosInstance from '../util/ApiInstance';
-
+import axios from 'axios'
 // Define functions to make API requests
 export const listAccounts = async () => {
   try {
@@ -80,7 +80,7 @@ export const getConnector = async () => {
 export const addAccount = async (accountname) => {
   try {
     const response = await axiosInstance.post(`/add-account?account_name=${accountname}`);
-    return response.data;
+    return response?.data;
   } catch (error) {
     console.error('Error creating user:', error);
     throw error;

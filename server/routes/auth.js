@@ -6,7 +6,7 @@ import validator from 'validator'; // Install this package using: npm install va
 import crypto from 'crypto';
 
 
-import User from '../models/User.js';
+import User from '../models/user.js';
 
 const router = express.Router();
 
