@@ -3,7 +3,8 @@ import axios from 'axios';
 const authToken = 'YWRtaW46YWRtaW4=';
 // Create an Axios instance with default configuration
 const axiosInstance = axios.create({
-  baseURL: 'https://blacklemon.app/api',  // Replace with your API base URL
+  // baseURL: 'https://blacklemon.app/api',  // Replace with your API base URL
+  baseURL: 'http://localhost:5000/api',  // Replace with your API base URL
   'accept': 'application/json',         // Accept header for JSON response
   'Authorization': `Basic ${authToken}`  
 });

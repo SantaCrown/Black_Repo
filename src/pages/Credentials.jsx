@@ -5,6 +5,8 @@ import InputType from "../uielement/InputType";
 import DropDownSelect from "../uielement/DropDownSelect";
 import Button from '../uielement/Button';
 import Popmsg from '../uielement/Popmsg';
+import axios from 'axios'
+import { useSearchParams } from 'react-router-dom';
 
 function Credentials() {
   const [accounts, setAccounts] = useState(null);
@@ -18,9 +20,14 @@ function Credentials() {
   const [loadingState, setLoadingState] = useState(null); // Track button loading state
   const [selCon, setSelConnectors] = useState();
   const [apiData, setApiCred] = useState({});
+  const [accountlist, setAccountList] = useState([])
+  const [state, setState] = useState(false)
+  const [selId, setSelId] = useState(null)
+
   function addAccnoutInput(val) {
     setAccounts(val.target.value);
   }
+
   function setApi(data) {
     const input = data.target.parentElement.innerText,  // The dynamic key (e.g., 'revDate')
       value = data.target.value;  // The value of that key (e.g., the value inputted)
@@ -38,21 +45,27 @@ function Credentials() {
     const fetchAccounts = async () => {
       try {
         const userData = await listAccounts();
+
         setUserData([]);
         setSelectData([]); // Reset select data before setting new data
-        userData.forEach(element => {
-          setSelectData(prevData => [...prevData, { value: element, label: element }]);
-        });
+        const accountList = userData?.accounts || [];
+        const formattedData = accountList?.map((item) => ({
+          value: item._id,// or any unique identifier
+          label: item.name,            // assuming `item` is a string
+        }));
 
-        // Use a for-loop to handle async operations properly
-        for (const ele of userData) {
+        setSelectData(formattedData);
+
+        accountList?.map(async (item) => {
           try {
-            const acc = await getCredentials(ele);
-            setUserData(prevData => [...prevData, { ele, acc }]);
+            const itemId = item._id;
+            const acc = await getCredentials(item._id);
+            const accData = acc?.credentials || []
+            setUserData(prevData => [...prevData, { itemId, accData }]);
           } catch (error) {
             setError('Failed to load user credentials');
           }
-        }
+        })
 
       } catch (error) {
         setError('Failed to load users');
@@ -60,50 +73,43 @@ function Credentials() {
     };
 
     fetchAccounts();
-  }, [account]);
+  }, [state]);
 
   useEffect(() => {
     const fetchConnectors = async () => {
-      const connectors = await getConnector(accounts);
-      setConnectors(prevData => [
-        ...prevData,
-        ...connectors.map(element => ({
-          value: element,
-          label: element,
-        }))
-      ]);
+      const connectors = await getConnector();
+      const connector = connectors?.connectors || [];
+      const formattedData = connector?.map((item) => ({
+        value: item._id,// or any unique identifier
+        label: item.name,            // assuming `item` is a string
+      }));
+
+      setConnectors(formattedData)
     }
 
     fetchConnectors();
-  }, []); // Empty dependency array to fetch once when the component mounts
+  }, [state]); // Empty dependency array to fetch once when the component mounts
 
+  const addAccountMn = async () => {
 
-  function addAccountMn() {
-    const addAccounts = async () => {
-      setLoadingState('add'); // Set loading state to 'add' button
-
-      try {
-        const addedAcc = await addAccount(accounts);
-        console.log(addedAcc);
-        setError(false);
-        setPopmsg(addedAcc.message);
-        setAccountAdd(true);
-      } catch (error) {
-        setError(true);
-        setPopmsg(error?.response?.data?.detail);
-      } finally {
-        setLoadingState(null); // Reset loading state
-      }
-    };
-
-    addAccounts();
+    setLoadingState('add'); // Set loading state to 'add' button
+    const addedAcc = await addAccount(accounts);
+    setError(false);
+    setPopmsg(addedAcc?.msg);
+    setAccountAdd(true);
+    setState(!state)
+    setLoadingState(null); // Reset loading state
   }
 
   function selectedValue(data) {
     setDelAcc(data.value);
   }
+
+
+
   function selectedValueConnectors(data) {
     setSelConnectors(data.value);
+    setSelId(data.label)
   }
 
   function deleteAccountMn() {
@@ -112,9 +118,9 @@ function Credentials() {
 
       try {
         const deleteAcc = await delAccount(delAcc);
-        console.log(deleteAcc);
         setError(false);
-        setPopmsg(deleteAcc.message);
+        setPopmsg(deleteAcc?.msg);
+        if (deleteAcc?.msg == "success") setState(!state)
         setAccountAdd(true);
 
         // Refresh the dropdown options after deletion
@@ -150,7 +156,6 @@ function Credentials() {
 
       try {
         const connector = await connectKey(apiData, selCon, delAcc);
-        console.log(connector)
         setLoadingState(null);
         setError(false);
         setPopmsg(connector.message);
@@ -159,10 +164,10 @@ function Credentials() {
         setError(true);
         setPopmsg(error?.response?.data?.detail);
       } finally {
+        setState(!state)
         setLoadingState(null); // Reset loading state
       }
     };
-
     addconnector();
   }
 
@@ -175,10 +180,20 @@ function Credentials() {
             <ul>
               {data?.map((item, index) => (
                 <li key={index}>
-                  <div>🏦 {item.ele}</div>
-                  {item.acc && <ul>{item.acc.map(eleItem =>
-                    <li key={eleItem}>{eleItem}</li>
-                  )} </ul>}
+
+                  {item?.accData?.map((eleItem) => (
+                    <>
+                      <div>
+                        {
+                          eleItem?.name?.name && <div>🏦 {eleItem?.name?.name}</div>
+                        }
+                      </div>
+                      <div>account : {eleItem?.name?.name}</div>
+                      <div>connector : {eleItem?.connector?.name}</div>
+                    </>
+                  )
+                  )}
+
                 </li>
               ))}
             </ul>
@@ -201,7 +216,9 @@ function Credentials() {
 
         <Card heading="Delete Account" size="full">
           <div className="available-accounts">
-            {selectData.length > 0 ? <DropDownSelect setSelectedVal={selectedValue} options={selectData} /> : "No account to delete"}
+            {selectData.length > 0 ? <DropDownSelect
+              setSelectedVal={selectedValue}
+              options={selectData} /> : "No account to delete"}
             <Button
               buttonType="button"
               handler={deleteAccountMn}
@@ -211,28 +228,35 @@ function Credentials() {
             </Button>
           </div>
         </Card>
+
         <Card heading="Add Credentials" size="full">
+
           <div className="available-accounts add-cred-method">
 
             <div className='add-credentials'>
               <h3>Select Account</h3>
-              {selectData.length > 0 ? <DropDownSelect setSelectedVal={selectedValue} options={selectData} /> : "No account to delete"}
-
+              {selectData.length > 0 ?
+                <DropDownSelect
+                  setSelectedVal={selectedValue}
+                  options={selectData} /> : "No account to delete"}
             </div>
+
             <div className='add-credentials'>
               <h3>Select Connectors</h3>
-              {selectData.length > 0 ? <DropDownSelect setSelectedVal={selectedValueConnectors} options={connectors} /> : "No account to delete"}
-
+              {selectData.length > 0 ?
+                <DropDownSelect
+                  setSelectedVal={selectedValueConnectors}
+                  options={connectors} /> : "No account to delete"}
             </div>
 
-
           </div>
+
           <div className="available-accounts add-cred-method add-cred-bot">
-            {delAcc && <p>Provide Configuration Map for <b>{selCon}</b></p>}
+            {delAcc && <p>Provide Configuration Map for <b>{selId}</b></p>}
 
             {selCon && <div className="bot-feild">
-              <InputType onInputChange={setApi} label={`${selCon}_api_key`} type="text" icon="false" placeholder="Api Key" />
-              <InputType onInputChange={setApi} label={`${selCon}_api_secret`} type="text" icon="false" placeholder="Api Secret" />
+              <InputType onInputChange={setApi} label={`${selId}_api_key`} type="text" icon="false" placeholder="Api Key" />
+              <InputType onInputChange={setApi} label={`${selId}_api_secret`} type="text" icon="false" placeholder="Api Secret" />
 
             </div>}
             <br />
@@ -246,6 +270,7 @@ function Credentials() {
           </div>
         </Card>
         {popmsg && <Popmsg className={error ? "error" : ""}>{popmsg}</Popmsg>}
+
       </div>
     </div>
   );
