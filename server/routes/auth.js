@@ -130,7 +130,7 @@ router.get(
     console.log('Google callback hit');
     next();
   },
-  passport.authenticate('google', { failureRedirect: '/login'}),
+  passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
     const token = jwt.sign({ userId: req.user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.redirect(`http://localhost:3000/dashboard?token=${token}`);
