@@ -31,7 +31,7 @@ const DropDownSelect = ({ options, setSelectedVal }) => {
   return (
     <div className="custom-dropdown" ref={dropdownRef}>
       <div className={`dropdown-header ${isOpen && "open"}`} onClick={toggleDropdown}>
-        {selectedOption.label} <span>{<SelectArrow/>}</span>
+        {selectedOption?.label} <span>{<SelectArrow/>}</span>
       </div>
       {isOpen && (
         <div className="dropdown-list">

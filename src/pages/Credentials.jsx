@@ -21,7 +21,7 @@ function Credentials() {
   const [selCon, setSelConnectors] = useState();
   const [apiData, setApiCred] = useState({});
   const [accountlist, setAccountList] = useState([])
-  const [state, setState] = useState(false)
+  const [state, setState] = useState(true)
   const [selId, setSelId] = useState(null)
 
   function addAccnoutInput(val) {
@@ -35,8 +35,6 @@ function Credentials() {
     // Remove any object with the same key and value from prevData
     setApiCred(prevData => {
       const { [input]: removed, ...rest } = prevData; // Destructure to remove the existing key
-
-      // Add the new key-value pair, preserving the other keys
       return { ...rest, [input]: value };
     });
   }
@@ -45,7 +43,6 @@ function Credentials() {
     const fetchAccounts = async () => {
       try {
         const userData = await listAccounts();
-
         setUserData([]);
         setSelectData([]); // Reset select data before setting new data
         const accountList = userData?.accounts || [];
@@ -83,7 +80,6 @@ function Credentials() {
         value: item._id,// or any unique identifier
         label: item.name,            // assuming `item` is a string
       }));
-
       setConnectors(formattedData)
     }
 
@@ -91,7 +87,6 @@ function Credentials() {
   }, [state]); // Empty dependency array to fetch once when the component mounts
 
   const addAccountMn = async () => {
-
     setLoadingState('add'); // Set loading state to 'add' button
     const addedAcc = await addAccount(accounts);
     setError(false);
@@ -104,8 +99,6 @@ function Credentials() {
   function selectedValue(data) {
     setDelAcc(data.value);
   }
-
-
 
   function selectedValueConnectors(data) {
     setSelConnectors(data.value);
@@ -122,7 +115,6 @@ function Credentials() {
         setPopmsg(deleteAcc?.msg);
         if (deleteAcc?.msg == "success") setState(!state)
         setAccountAdd(true);
-
         // Refresh the dropdown options after deletion
         await fetchUpdatedAccounts(); // Refetch the accounts after deletion
 
@@ -133,7 +125,6 @@ function Credentials() {
         setLoadingState(null); // Reset loading state
       }
     };
-
     deleteAccounts();
   }
 
@@ -232,7 +223,6 @@ function Credentials() {
         <Card heading="Add Credentials" size="full">
 
           <div className="available-accounts add-cred-method">
-
             <div className='add-credentials'>
               <h3>Select Account</h3>
               {selectData.length > 0 ?
@@ -248,7 +238,6 @@ function Credentials() {
                   setSelectedVal={selectedValueConnectors}
                   options={connectors} /> : "No account to delete"}
             </div>
-
           </div>
 
           <div className="available-accounts add-cred-method add-cred-bot">
@@ -270,7 +259,6 @@ function Credentials() {
           </div>
         </Card>
         {popmsg && <Popmsg className={error ? "error" : ""}>{popmsg}</Popmsg>}
-
       </div>
     </div>
   );
