@@ -8,6 +8,7 @@ const botSchema = new mongoose.Schema({
     mode: { type: String, required: true },
     connector: { type:Object, required: true },
     trading: { type: Object, required: true },
+    info : {type:Object, required : true}
 
 }, {
     timestamps: true

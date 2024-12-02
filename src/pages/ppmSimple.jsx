@@ -65,7 +65,6 @@ function PpmSimple() {
         acc[key] = true;
         return acc;
       }, {});
-      console.log("tradingPair===>", tradingValue);
     }
 
     if (connector.length !== 1) {
@@ -76,7 +75,6 @@ function PpmSimple() {
         acc[key] = true;
         return acc;
       }, {});
-      console.log("===>", connectorValue);
     }
 
     if (botName && profit && size && !isNaN(numberSize) && !isNaN(profitSize) && tradingValue && connectorValue) {

@@ -9,7 +9,11 @@ import Credential from '../models/credential.js'
 import Connector from '../models/connector.js'
 import Bot from '../models/bot.js'
 import User from '../models/user.js';
+import Trading from '../models/strategy.js';
 import mongoose from 'mongoose';
+import ccxt from 'ccxt';
+import dotenv from 'dotenv'
+dotenv.config();
 
 const router = express.Router();
 
@@ -88,23 +92,70 @@ router.post('/bot-config', async (req, res) => {
     const trading = req.body.tradingValue
 
 
-    console.log("botName", botName);
-    console.log("size", size);
-    console.log("profit", profit);
-    console.log("mode", mode);
-    console.log("connector", connector);
-    console.log("pairObj", trading);
 
-    const bot = new Bot({
-        botName: botName,
-        size: size,
-        profit: profit,
-        trading: trading,
-        connector: connector,
-        mode: mode,
-    })
 
-    await bot.save()
-    console.log("success");
+    try {
+        // Initialize KuCoin with credentials
+        const kucoin = new ccxt.kucoin({
+            apiKey: '673c26606cbc8d0001aa32c4',
+            secret: '9179ae15-8ba3-4d75-8c3c-6c4f47aa47d4',
+            password: '9717944941',
+        });
+
+        // Fetch account information (requires valid credentials)
+        const accountInfo = await kucoin.fetchBalance();
+
+        const marketData = await kucoin.loadMarkets()
+
+        // Print some key account details
+        console.log('API Key and Credentials Verified Successfully!');
+        // console.log('Account Info:', accountInfo.info.data);
+        // console.log('Market Data:', marketData);
+
+        const ethUsdtMarket = marketData['ETH/USDT'];
+        if (ethUsdtMarket) {
+            console.log('ETH/USDT Market Data:', ethUsdtMarket);
+            // const trading = new Trading(ethUsdtMarket.info)
+            // await trading.save()
+
+            const bot = new Bot({
+                botName: botName,
+                size: size,
+                profit: profit,
+                trading: trading,
+                connector: connector,
+                mode: mode,
+                info: ethUsdtMarket.info
+            })
+
+            await bot.save()
+        } else {
+            console.log('ETH/USDT not found in available markets.');
+        }
+        return true;
+    } catch (error) {
+        console.error('Error verifying KuCoin API credentials:', error.message);
+        return false;
+    }
+
+
+
+
 })
+
+router.get('/get-strategy', async (req, res) => {
+    try {
+
+        const strategy = await Bot.find()
+        return res.send({
+            strategy
+        })
+    } catch (err) {
+        console.log("error", err);
+
+    }
+
+})
+
+
 export default router;

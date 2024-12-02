@@ -14,6 +14,7 @@
   "dependencies": {
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
+    "ccxt": "^4.4.35",
     "child_process": "^1.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -22,7 +23,7 @@
     "jsonwebtoken": "^9.0.2",
     "kucoin-node-sdk": "^1.1.1",
     "mongodb": "^6.3.0",
-    "mongoose": "^8.8.2",
+    "mongoose": "^8.8.3",
     "nodemailer": "^6.9.16",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
