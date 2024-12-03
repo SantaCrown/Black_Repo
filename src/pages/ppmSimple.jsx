@@ -155,14 +155,13 @@ function PpmSimple() {
         })
       console.log(response.data);
     }
-
   }
 
   const [checkboxes, setCheckboxes] = useState({
-    Eth: false,
+    ETH: false,
     XRP: false,
-    USDT: false,
     BTC: false,
+    USDT: false,
   });
 
   const [connectors, setConnectors] = useState({
