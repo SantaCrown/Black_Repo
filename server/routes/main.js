@@ -10,9 +10,14 @@ import Connector from '../models/connector.js'
 import Bot from '../models/bot.js'
 import User from '../models/user.js';
 import Trading from '../models/strategy.js';
+import Order from '../models/orderBook.js'
+import MarketPrice from '../models/marketPrice.js';
 import mongoose from 'mongoose';
 import ccxt from 'ccxt';
 import dotenv from 'dotenv'
+import getOrderBook from '../controller/getOrderBook.js'
+import getMarketPrice from '../controller/getMarketprice.js'
+// import 
 dotenv.config();
 
 const router = express.Router();
@@ -90,72 +95,78 @@ router.post('/bot-config', async (req, res) => {
     const mode = req.body.mode
     const connector = req.body.connectorValue
     const trading = req.body.tradingValue
-
-
-
-
+    // const spread = 0.002;  // Desired spread (e.g., 0.2%)
+    
     try {
-        // Initialize KuCoin with credentials
+        const key = Object.keys(connector).find(key => connector[key]);
+        const resId = await Connector.find({
+            name: key.toLowerCase()
+        })
+        const id = resId[0]._id
+        const resConnector = await Credential.find({
+            connector: id
+        })
+        const apiKeyObj = resConnector[0].apikey[0]
+        const firstVal = Object.values(apiKeyObj)[0]
+        const secondVal = Object.values(apiKeyObj)[1]
+        const tradingFirst = Object.keys(trading)[0].toUpperCase()
+        const tradingSecond = Object.keys(trading)[1].toUpperCase()
+
         const kucoin = new ccxt.kucoin({
-            apiKey: '673c26606cbc8d0001aa32c4',
-            secret: '9179ae15-8ba3-4d75-8c3c-6c4f47aa47d4',
+            apiKey: firstVal,
+            secret: secondVal,
             password: '9717944941',
         });
 
-        // Fetch account information (requires valid credentials)
-        const accountInfo = await kucoin.fetchBalance();
-
         const marketData = await kucoin.loadMarkets()
+        const ethUsdtMarket = marketData[`${tradingFirst}/${tradingSecond}`];
 
-        // Print some key account details
-        console.log('API Key and Credentials Verified Successfully!');
-        // console.log('Account Info:', accountInfo.info.data);
-        // console.log('Market Data:', marketData);
-
-        const ethUsdtMarket = marketData['ETH/USDT'];
         if (ethUsdtMarket) {
-            console.log('ETH/USDT Market Data:', ethUsdtMarket);
-            // const trading = new Trading(ethUsdtMarket.info)
-            // await trading.save()
+        const symbol = ethUsdtMarket?.info.symbol
+        const orderBook = await getOrderBook(symbol);
+        const marketPrice = await getMarketPrice(symbol);
 
-            const bot = new Bot({
-                botName: botName,
-                size: size,
-                profit: profit,
-                trading: trading,
-                connector: connector,
-                mode: mode,
-                info: ethUsdtMarket.info
-            })
+        const newOrderBook = new Order({
+            orderbook : orderBook
+        })
+        await newOrderBook.save()
 
-            await bot.save()
+        const newMarketPrice = new MarketPrice({
+            marketprice: marketPrice
+        })
+        await newMarketPrice.save()
+
+        const bot = new Bot({
+            botName: botName,
+            size: size,
+            profit: profit,
+            trading: trading,
+            connector: connector,
+            mode: mode,
+            info: ethUsdtMarket.info
+        })
+        
+        await bot.save()
+
         } else {
-            console.log('ETH/USDT not found in available markets.');
+            console.log(`${tradingFirst}/${tradingSecond} not found in available markets.`);
         }
         return true;
     } catch (error) {
         console.error('Error verifying KuCoin API credentials:', error.message);
         return false;
     }
-
-
-
-
 })
 
 router.get('/get-strategy', async (req, res) => {
     try {
-
         const strategy = await Bot.find()
         return res.send({
             strategy
         })
     } catch (err) {
         console.log("error", err);
-
     }
-
 })
-
 
 export default router;
