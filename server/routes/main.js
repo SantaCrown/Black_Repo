@@ -17,6 +17,8 @@ import ccxt from 'ccxt';
 import dotenv from 'dotenv'
 import getOrderBook from '../controller/getOrderBook.js'
 import getMarketPrice from '../controller/getMarketprice.js'
+import fetchMarketData from '../controller/fetchOrder.js';
+import runningBot from '../controller/botRunning.js'
 // import 
 dotenv.config();
 
@@ -122,10 +124,13 @@ router.post('/bot-config', async (req, res) => {
         const ethUsdtMarket = marketData[`${tradingFirst}/${tradingSecond}`];
 
         if (ethUsdtMarket) {
+
         const symbol = ethUsdtMarket?.info.symbol
         const orderBook = await getOrderBook(symbol);
         const marketPrice = await getMarketPrice(symbol);
-
+        // const fetchMarket = await fetchMarketData(symbol)
+        
+        
         const newOrderBook = new Order({
             orderbook : orderBook
         })
@@ -167,6 +172,10 @@ router.get('/get-strategy', async (req, res) => {
     } catch (err) {
         console.log("error", err);
     }
+})
+
+router.post('/bot-start', async (req, res) => {
+    runningBot()
 })
 
 export default router;
