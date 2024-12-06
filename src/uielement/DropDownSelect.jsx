@@ -38,7 +38,7 @@ const DropDownSelect = ({ options, setSelectedVal }) => {
           {options.map((option) => (
             <div
               key={option.value}
-              className="dropdown-option"
+              className="dropdown-option text-white"
               onClick={() => handleOptionClick(option)}
             >
               {option.label}

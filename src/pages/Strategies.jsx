@@ -40,6 +40,8 @@ function Strategies() {
 
     const selectedObjectArray = marketData?.filter(item => item._id === id);
 
+    console.log("selectedObjectArray", selectedObjectArray);
+    
     return (
       <div>
         {
@@ -49,7 +51,16 @@ function Strategies() {
                 {item?.botName}'s more detailed information
               </div>
               <div> BotName : {item?.botName} </div>
-              <div> symbol : {item?.info?.symbol} </div>
+              {
+              
+              }
+              {
+                Object.entries(item.info).map(([key, value]) => 
+                // ( <p key={key}>
+                  `${key}: ${value}`
+                // </p>))
+              )}
+              {/* <div> symbol : {item?.info?.symbol} </div>
               <div> baseCurrency : {item?.info.baseCurrency} </div>
               <div> quoteCurrency : {item?.info.quoteCurrency} </div>
               <div> feeCurrency : {item?.info.feeCurrency} </div>
@@ -73,11 +84,13 @@ function Strategies() {
               <div> callauctionFirstStageStartTime : {item?.info.callauctionFirstStageStartTime? `${item?.info.callauctionFirstStageStartTime}` : 'Null'} </div>
               <div> callauctionSecondStageStartTime : {item?.info.callauctionSecondStageStartTime ? `${item?.info.callauctionSecondStageStartTime}` : 'Null'} </div>
               <div> callauctionThirdStageStartTime : {item?.info.callauctionThirdStageStartTime ? `${item?.info.callauctionThirdStageStartTime}` : 'Null'} </div>
-              <div> tradingStartTime : {item?.info.tradingStartTime ? `${item?.info.tradingStartTime}` : 'Null'} </div>
+              <div> tradingStartTime : {item?.info.tradingStartTime ? `${item?.info.tradingStartTime}` : 'Null'} </div> */}
             </div>
           ))
         }
       </div>
+      
+   
     )
   }
 

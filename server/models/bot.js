@@ -5,7 +5,9 @@ const botSchema = new mongoose.Schema({
     botName: { type: String, required: true },
     size: { type: String, required: true },
     profit: { type: String, required: true },
+    spread: { type: String, required: true },
     mode: { type: String, required: true },
+    botStyle: { type: String, required: true },
     connector: { type:Object, required: true },
     trading: { type: Object, required: true },
     info : {type:Object, required : true}
