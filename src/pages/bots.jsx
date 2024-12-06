@@ -8,6 +8,7 @@ import { SettingIcon, ViewIcon, PlayIcon } from "../icons/icons";
 import DropDownSelect from "../uielement/DropDownSelect";
 import Popmsg from '../uielement/Popmsg';
 import axios from 'axios';
+
 function Bots() {
   const [buttonOpen, setButtonOpen] = useState(false)
   const [account, setAccounts] = useState(null);
@@ -133,19 +134,47 @@ function Bots() {
     setScriptValue(data.value);
   }
 
-  const botStart = async () => {
-    const response = await axios.post('http://localhost:5000/api/bot-start')
-    console.log(response);
 
+  const [runAcc, setRunAcc] = useState('')
+
+  function selectedValue(data) {
+    setRunAcc(data.value);
   }
+
+  console.log('redaas->>>', runAcc);
+
+  const botStart = async () => {
+    const response = await axios.post('http://localhost:5000/api/bot-start', {runAcc})
+    console.log('running result', response?.data);
+    if(response?.data?.msg) setPopmsg(response?.data?.msg)
+  }
+
+  const [botAccount, setBotAccount] = useState([])
+
+  const getBotAccount = async () => {
+
+    const response = await axios.get('http://localhost:5000/api/bot-get')
+    console.log('getbot', response.data);
+    const bot = response?.data || []
+    const formData = bot?.map((item) => ({
+      value: item._id,
+      label: item.botName
+    }))
+    setBotAccount(formData)
+  }
+
+  useEffect(() => {
+    getBotAccount()
+  }, [])
+
+  
   return (
     <div className="bots bot-run">
       {popmsg && <Popmsg className={error ? "error" : ""}>{popmsg}</Popmsg>}
       <h2 className="heading-top">
-        Bots
-
+        Bots Running
       </h2>
-      <p className="bot-breadcrumb ">Create bot based on <span>“Tony’s Strategy”</span></p>
+      {/* <p className="bot-breadcrumb ">Create bot based on <span>“Tony’s Strategy”</span></p>
       <div className="conatiner-grid cards card-full">
         <Card heading="" size="full">
           <div className="table-bar">
@@ -189,11 +218,35 @@ function Bots() {
           </div>
         </Card>
       </div>
-
       <div>
         <button onClick={botStart}>
           Bot start
         </button>
+      </div> */}
+
+
+      <div>
+        <div className="available-accounts">
+          {botAccount.length > 0 ? <DropDownSelect
+            setSelectedVal={selectedValue}
+            options={botAccount} /> : "No account to delete"}
+          <Button
+            buttonType="button"
+            handler={botStart}
+            className="default-btn"
+          >
+            Start
+            {/* {loadingState === 'delete' ? "Please Wait" : "Delete Account"} */}
+          </Button>
+          <Button
+            buttonType="button"
+            // handler={deleteAccountMn}
+            className="default-btn"
+          >
+            Stop
+            {/* {loadingState === 'delete' ? "Please Wait" : "Delete Account"} */}
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -6,47 +6,7 @@ import Bot from '../models/bot.js'
 
 dotenv.config()
 
-const calculateSpread = (bid, ask) => {
-    return (ask - bid) / ask;
-}
-
-const startBot = () => {
-    if (!botRunning) {
-        console.log("Starting the bot...");
-        botRunning = true;
-        runStrategy();
-    }
-}
-
-const stopBot = (reason) => {
-    if (botRunning) {
-        console.log(`Stopping the bot: ${reason}`);
-        botRunning = false;
-    }
-}
-
-
-const runStrategy = async () => {
-    console.log("here is run bot");
-
-    if (!botRunning) return;
-
-    const market = await fetchMarketData(marketData.symbol);
-    if (!market) return stopBot("Market data unavailable");
-
-    const isSpreadValid = market.spread >= THRESHOLDS.MIN_SPREAD;
-
-    if (isSpreadValid) {
-        const orderSize = 0.01; // Example order size
-        await placeOrder("buy", market.bid, orderSize);
-        await placeOrder("sell", market.ask, orderSize);
-    } else {
-        const reason = !isSpreadValid ? "Spread too narrow" : "normal"
-        stopBot(reason);
-    }
-}
-
-async function placeOrder(symbol, side, price, size) {
+const placeOrder = async (symbol, side, price, size) => {
     const BASE_URL = process.env.BASE_URL
     const API_KEY = process.env.KUCOIN_API_KEY
 
@@ -65,55 +25,66 @@ async function placeOrder(symbol, side, price, size) {
     }
 }
 
+const calculatePrice = (bid, ask) => {
+    return (bid + ask) / 2
+}
 
-const runningBot = async () => {
+const runningBot = async (botSelect) => {
 
-    const marketData = await MarketPrice.find({}).sort({ createdAt: -1 })
-    console.log("marktData", marketData[0]);
-    const marketDataVal = marketData[0]
-    const gottenSpreadVal = (marketDataVal.sell - marketDataVal.buy) / marketDataVal.sell
-    const averagePrice = marketDataVal.averagePrice
-    const feeRate = marketDataVal.takerFeeRate
-    const symbol = marketDataVal.symbol
+    console.log("_______running bot_____");
 
-    const botData = await Bot.find({})
-    console.log('botdta', botData);
+    if (botSelect === 'kuocin') {
+        console.log('__kucoin order start__');
 
+        const marketData = await MarketPrice.find({}).sort({ createdAt: -1 })
+        const marketDataVal = marketData[0]
+        const ask = marketDataVal.marketprice.sell * 1
+        const bid = marketDataVal.marketprice.buy * 1
+        const gottenSpreadVal = (ask - bid) / ask
+        const averagePrice = calculatePrice(ask, bid)
+        const feeRate = marketDataVal.takerFeeRate * 1
+        const symbol = marketDataVal.symbol
+        const botData = await Bot.find({})
+        const botDataVal = botData[0]
+        const limit_spread = botDataVal.spread * 1
+        const limit_profit = botDataVal.profit * 1
+        const size = botDataVal.size * 1
 
-    if (gottenSpreadVal < 0.2) {
-        console.log("plavceorder fatal");
+        if (limit_profit < feeRate) {
+            console.log("condition error");
+            const msg = 'Condition Error'
+            return 'error';
 
-    } else {
-        console.log("success===============================");
+        } else {
+            const sellPrice = averagePrice * 1 + averagePrice * limit_spread * 1
+            const buyPrice = averagePrice * 1 - averagePrice * limit_spread * 1
+            console.log("sellPrice", sellPrice);
+            console.log("buyPrice", buyPrice);
 
-        // placeOrder(symbol, sell, averagePrice, 0.1)
+            console.log("success===============================");
+            // placeOrder(symbol, sell, sellPrice, size)
+            // placeOrder(symbol, buy, buyPrice, size)
+            return true;
+        }
     }
+    if (botSelect === 'uniswap') {
+        console.log("uniswap placeorder");
+        const orderCondition = await Bot.find({ botStyle: botSelect })
+        const condition = orderCondition[0]
+        const spreadVal = condition.spread
+        const sizeVal = condition.size
+        console.log("condition", condition.info);
+        const bidPrice = condition.info.token1Price * (1 - spreadVal * 1)
+        const askPrice = condition.info.token1Price * (1 + spreadVal * 1)
 
-    // const THRESHOLDS = {
-    //     MIN_SPREAD: 0.002, // Minimum bid-ask spread (e.g., 0.2%)
-    //     MAX_VOLATILITY: 0.02, // Maximum volatility (e.g., 2%)
-    //     MIN_LIQUIDITY: 10, // Minimum liquidity factor (e.g., 10x order size)
-    //     MIN_PROFIT_MARGIN: 0.001, // Minimum profit margin (e.g., 0.1%)
-    // };
-
-    // const marketData = await marketPrice.find()
+        // placeOrder()
+        return true;
+    }
 }
 
 export default runningBot
 
 let botRunning = false;
-
-const marketData = {
-    symbol: "BTC-USDT",
-    bid: 95209,
-    ask: 95209.1,
-    spread: 0.002, // Example spread calculation (ask - bid) / ask
-    volatility: 0.015, // Example hourly volatility
-    liquidityFactor: 12, // Example liquidity calculation
-    feeRate: 0.001, // Taker fee rate
-};
-
-
 
 
 
