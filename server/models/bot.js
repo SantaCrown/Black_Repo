@@ -11,7 +11,6 @@ const botSchema = new mongoose.Schema({
     connector: { type:Object, required: true },
     trading: { type: Object, required: true },
     info : {type:Object, required : true}
-
 }, {
     timestamps: true
 });
