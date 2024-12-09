@@ -5,8 +5,8 @@ import axios from 'axios';
 const uniswapBot = async (symbol1, symbol2, botName, size, profit, spread, trading, connector, mode, botStyle, refreshTime, coolTime) => {
 
     const query = `
-		{
-            pools(where: {id: "0x4e68ccd3e89f51c3074ca5072bbac773960dfa36"}) {
+    	{
+            pools(where: {id: "0x4e68ccd3e89f51c3074ca5072bbac773960dfa36" }) {
                 id
                 token0 {
                     symbol
@@ -38,10 +38,11 @@ const uniswapBot = async (symbol1, symbol2, botName, size, profit, spread, tradi
         trading: trading,
         connector: connector,
         mode: mode,
-        botStyle : botStyle,
+        botStyle: botStyle,
         info: saveData
     })
 
+    console.log("savedata -->", saveData);
     await bot.save()
 }
 
