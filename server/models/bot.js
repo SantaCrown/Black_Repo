@@ -7,6 +7,7 @@ const botSchema = new mongoose.Schema({
     profit: { type: String, required: true },
     spread: { type: String, required: true },
     mode: { type: String, required: true },
+    status: { type: Boolean, default: false },
     botStyle: { type: String, required: true },
     connector: { type:Object, required: true },
     trading: { type: Object, required: true },

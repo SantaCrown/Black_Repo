@@ -41,60 +41,58 @@ function Strategies() {
     const selectedObjectArray = marketData?.filter(item => item._id === id);
 
     console.log("selectedObjectArray", selectedObjectArray);
-    
+
+    let infoData;
     return (
-      <div>
-        {
-          selectedObjectArray && selectedObjectArray.map((item) => (
-            <div>
-              <div>
-                {item?.botName}'s more detailed information
-              </div>
-              <div> BotName : {item?.botName} </div>
-              {
-              
-              }
-              {
-                Object.entries(item.info).map(([key, value]) => 
-                // ( <p key={key}>
-                  `${key}: ${value}`
-                // </p>))
-              )}
-              {/* <div> symbol : {item?.info?.symbol} </div>
-              <div> baseCurrency : {item?.info.baseCurrency} </div>
-              <div> quoteCurrency : {item?.info.quoteCurrency} </div>
-              <div> feeCurrency : {item?.info.feeCurrency} </div>
-              <div> market : {item?.info.market} </div>
-              <div> baseMinSize : {item?.info.baseMinSize} </div>
-              <div> quoteMinSize : {item?.info.quoteMinSize} </div>
-              <div> baseMaxSize : {item?.info.baseMaxSize} </div>
-              <div> quotenaxSize : {item?.info.quotenaxSize} </div>
-              <div> priceIncrement : {item?.info.priceIncrement} </div>
-              <div> priceLimitRate : {item?.info.priceLimitRate} </div>
-              <div> minFunds : {item?.info.minFunds} </div>
-              <div> isMarginEnabled : {item?.info.isMarginEnabled ? 'True' : 'False' } </div>
-              <div> enableTrading : {item?.info.enableTrading ? 'True' : 'False' } </div>
-              <div> feeCategory : {item?.info.feeCategory} </div>
-              <div> makerFeeCoefficient : {item?.info.makerFeeCoefficient} </div>
-              <div> takerFeeCoefficient : {item?.info.takerFeeCoefficient} </div>
-              <div> st : {item?.info.st ? 'True' : 'False' } </div>
-              <div> callauctionIsEnabled : {item?.info.callauctionIsEnabled ? 'True' : 'False' } </div>
-              <div> callauctionPriceCeiling : {item?.info.callauctionPriceCeiling ? `${item?.info.callauctionPriceCeiling}` : 'Null' } </div>
-              <div> callauctionPriceFloor : {item?.info.callauctionPriceFloor? `${item?.info.callauctionPriceFloor}` : 'Null'} </div>
-              <div> callauctionFirstStageStartTime : {item?.info.callauctionFirstStageStartTime? `${item?.info.callauctionFirstStageStartTime}` : 'Null'} </div>
-              <div> callauctionSecondStageStartTime : {item?.info.callauctionSecondStageStartTime ? `${item?.info.callauctionSecondStageStartTime}` : 'Null'} </div>
-              <div> callauctionThirdStageStartTime : {item?.info.callauctionThirdStageStartTime ? `${item?.info.callauctionThirdStageStartTime}` : 'Null'} </div>
-              <div> tradingStartTime : {item?.info.tradingStartTime ? `${item?.info.tradingStartTime}` : 'Null'} </div> */}
-            </div>
-          ))
-        }
+      <div className='w-full m-auto'>
+        <table className='w-full text-center'>
+          <thead className='text-lg font-bold'>
+            <td>No</td>
+            <td>Bot Name</td>
+            <td>Exchange</td>
+            <td>Trading pair</td>
+            <td>Trading Size</td>
+            <td>Spread</td>
+            <td>Profit Margin</td>
+            <td>Mode</td>
+          </thead>
+          <tbody>
+            {
+              selectedObjectArray && selectedObjectArray.map((item, key) => (
+                <tr index={key} >
+                  <td>
+                    {key + 1}
+                  </td>
+                  <td>
+                    {item?.botName}
+                  </td>
+                  <td>
+                    {item?.botStyle}
+                  </td>
+                  <td>
+                    {item?.botStyle}
+                  </td>
+                  <td>
+                    {item?.size}
+                  </td>
+                  <td>
+                    {item?.spread}
+                  </td>
+                  <td>
+                    {item?.profit}
+                  </td>
+                  <td>
+                    {item?.mode}
+                  </td>
+
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
       </div>
-      
-   
     )
   }
-
-
 
   return (
     <div className="stratiges">
@@ -113,7 +111,6 @@ function Strategies() {
               <p>Strategy</p>
               <p>Details</p>
             </div>
-
             {
               marketData && marketData.map((item, key) => (
                 <div index={key} className="table-tr head-tr" >
@@ -148,7 +145,6 @@ function Strategies() {
                 </div>
               ))
             }
-
           </div>
         </Card>
       </div>

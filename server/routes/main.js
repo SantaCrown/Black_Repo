@@ -23,6 +23,7 @@ import axios from 'axios';
 import kuCoinBot from '../controller/kucoin.js';
 import uniswapBot from '../controller/uniswap.js';
 import bot from '../models/bot.js';
+
 // import 
 dotenv.config();
 
@@ -105,6 +106,17 @@ router.post('/bot-config', async (req, res) => {
 	const refreshTime = req.body.refreshT
 	const coolTime = req.body.coolT
 
+
+	console.log('botName', botName);
+	console.log('size', size);
+	console.log('profit', profit);
+	console.log('spread', spread);
+	console.log('mode', mode);
+	console.log('connector', connector);
+	console.log('trading', trading);
+	console.log('refreshTime', refreshTime);
+	console.log('coolTime', coolTime);
+
 	try {
 		const key = Object.keys(connector).find(key => connector[key]);
 		const resId = await Connector.find({
@@ -115,23 +127,24 @@ router.post('/bot-config', async (req, res) => {
 		const tradingFirst = Object.keys(trading)[0].toUpperCase()
 		const tradingSecond = Object.keys(trading)[1].toUpperCase()
 		const botStyle = key.toLocaleLowerCase()
-		if (botStyle === 'kucoin') {
 
-			kuCoinBot(
-				tradingFirst,
-				tradingSecond,
-				botName,
-				size,
-				profit,
-				spread,
-				trading,
-				connector,
-				mode,
-				botStyle,
-				refreshTime,
-				coolTime
-			)
-		}
+		// if (botStyle === 'kucoin') {
+
+		// 	kuCoinBot(
+		// 		tradingFirst,
+		// 		tradingSecond,
+		// 		botName,
+		// 		size,
+		// 		profit,
+		// 		spread,
+		// 		trading,
+		// 		connector,
+		// 		mode,
+		// 		botStyle,
+		// 		refreshTime,
+		// 		coolTime
+		// 	)
+		// }
 
 		if (key.toLocaleLowerCase() === 'uniswap') {
 
@@ -170,14 +183,6 @@ router.get('/get-strategy', async (req, res) => {
 	}
 })
 
-router.post('/bot-start', async (req, res) => {
-
-	const botType = req.body.runAcc
-	const selectBot = await bot.find({ _id: botType })
-	const botSelect = selectBot[0]?.botStyle
-	runningBot(botSelect)
-	return res.send({ msg: "Order success!!!!!!!" })
-})
 
 router.get('/bot-get', async (req, res) => {
 	const botData = await Bot.find()
@@ -185,4 +190,39 @@ router.get('/bot-get', async (req, res) => {
 	return res.send(botData)
 })
 
+router.post('/bot-start', async (req, res) => {
+	console.log("___bot running page___");
+
+	const botType = req.body.id
+	const selectBot = await bot.find({ _id: botType })
+
+	if (selectBot[0]?.status) {
+		return res.send({ msg: "already running!" })
+	} else {
+		selectBot[0].status = true
+		await selectBot[0].save()
+		const botSelect = selectBot[0]?.botStyle
+		const tradingPairFirst = Object.keys(selectBot[0].trading)[0].toUpperCase()
+		const tradingPairSecond = Object.keys(selectBot[0].trading)[1].toUpperCase()
+console.log("tradingpair first", tradingPairFirst);
+console.log("tradingpair second", tradingPairSecond);
+const id = selectBot[0]._id
+		runningBot(botSelect, tradingPairFirst, tradingPairSecond,id )
+		return res.send({ msg: "Order success!!!!!!!" })
+	}
+})
+
+
+router.post('/bot-stop', async (req, res) => {
+	const botId = req.body.id
+	console.log('botId', botId);
+	const selectBot = await Bot.find({
+		_id : botId
+	})
+
+	selectBot[0].status = false
+	await selectBot[0].save()
+
+	return res.send({msg : 'Bot is stopped'})
+})
 export default router;

@@ -29,11 +29,15 @@ const calculatePrice = (bid, ask) => {
     return (bid + ask) / 2
 }
 
-const runningBot = async (botSelect) => {
+const runningBot = async (botSelect, first, second, id) => {
 
-    console.log("_______running bot_____");
+    console.log(`_______ ${botSelect} running bot_____`);
 
-    if (botSelect === 'kuocin') {
+    console.log('first', first);
+    console.log('second', second);
+    console.log('id', id);
+    
+    if (botSelect === 'kucoin') {
         console.log('__kucoin order start__');
 
         const marketData = await MarketPrice.find({}).sort({ createdAt: -1 })
@@ -69,7 +73,7 @@ const runningBot = async (botSelect) => {
     }
     if (botSelect === 'uniswap') {
         console.log("uniswap placeorder");
-        const orderCondition = await Bot.find({ botStyle: botSelect })
+        const orderCondition = await Bot.find({ _id: id })
         const condition = orderCondition[0]
         const spreadVal = condition.spread
         const sizeVal = condition.size
@@ -77,7 +81,9 @@ const runningBot = async (botSelect) => {
         const bidPrice = condition.info.token1Price * (1 - spreadVal * 1)
         const askPrice = condition.info.token1Price * (1 + spreadVal * 1)
 
-        // placeOrder()
+        // placeOrder(first, "buy", bidPrice, sizeVal)
+        // placeOrder(first, "sell", askPrice, sizeVal)
+        
         return true;
     }
 }
