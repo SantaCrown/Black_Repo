@@ -61,6 +61,7 @@ function Header({ hendlmobilemenu }) {
           <li>  <w3m-core-button></w3m-core-button></li>
             <li><Link to="/community">Community</Link></li>
             <li><Link to="/documentation">Documentation</Link></li>
+            <li><Link to="/tnc">Terms & Conditions</Link></li>
             <li><LogoutButton></LogoutButton></li>
           </ul>
           <div className="mob-menu"> <Link onClick={hendlmobilemenu} itemType="button"><MenuIcon /></Link></div>
