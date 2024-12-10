@@ -186,7 +186,6 @@ router.get('/get-strategy', async (req, res) => {
 
 router.get('/bot-get', async (req, res) => {
 	const botData = await Bot.find()
-	console.log('botdata', botData);
 	return res.send(botData)
 })
 
@@ -204,10 +203,8 @@ router.post('/bot-start', async (req, res) => {
 		const botSelect = selectBot[0]?.botStyle
 		const tradingPairFirst = Object.keys(selectBot[0].trading)[0].toUpperCase()
 		const tradingPairSecond = Object.keys(selectBot[0].trading)[1].toUpperCase()
-console.log("tradingpair first", tradingPairFirst);
-console.log("tradingpair second", tradingPairSecond);
-const id = selectBot[0]._id
-		runningBot(botSelect, tradingPairFirst, tradingPairSecond,id )
+		const id = selectBot[0]._id
+		runningBot(botSelect, tradingPairFirst, tradingPairSecond, id)
 		return res.send({ msg: "Order success!!!!!!!" })
 	}
 })
@@ -217,12 +214,12 @@ router.post('/bot-stop', async (req, res) => {
 	const botId = req.body.id
 	console.log('botId', botId);
 	const selectBot = await Bot.find({
-		_id : botId
+		_id: botId
 	})
 
 	selectBot[0].status = false
 	await selectBot[0].save()
 
-	return res.send({msg : 'Bot is stopped'})
+	return res.send({ msg: 'Bot is stopped' })
 })
 export default router;
