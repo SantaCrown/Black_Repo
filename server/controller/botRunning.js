@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import MarketPrice from '../models/marketPrice.js';
 import fetchMarketData from './fetchOrder.js';
 import Bot from '../models/bot.js'
+import swapContract from "./contractFunc.js";
 
 dotenv.config()
 
@@ -33,10 +34,6 @@ const runningBot = async (botSelect, first, second, id) => {
 
     console.log(`_______ ${botSelect} running bot_____`);
 
-    console.log('first', first);
-    console.log('second', second);
-    console.log('id', id);
-    
     if (botSelect === 'kucoin') {
         console.log('__kucoin order start__');
 
@@ -71,20 +68,25 @@ const runningBot = async (botSelect, first, second, id) => {
             return true;
         }
     }
+
     if (botSelect === 'uniswap') {
+
         console.log("uniswap placeorder");
         const orderCondition = await Bot.find({ _id: id })
         const condition = orderCondition[0]
         const spreadVal = condition.spread
         const sizeVal = condition.size
-        console.log("condition", condition.info);
         const bidPrice = condition.info.token1Price * (1 - spreadVal * 1)
         const askPrice = condition.info.token1Price * (1 + spreadVal * 1)
 
+        const res = await swapContract(sizeVal)
+        console.log('uniswap router contrct router-->', res);
+
+
         // placeOrder(first, "buy", bidPrice, sizeVal)
         // placeOrder(first, "sell", askPrice, sizeVal)
-        
-        return true;
+
+        // return true;
     }
 }
 
