@@ -46,16 +46,24 @@ import {
     },
     ethereumClient
   )
+ 
+  console.log('etherereum clinet', ethereumClient);
+
+  console.log('web3model', web3Modal);
+  
+  
   function parseEther(value){
    let str= String(Number(value)*10**9)
    return str+'000000000'
   
   }
+
   function openNewWindow(link) {
     console.log('hahahah')
     // Use window.open to open the link in a new window
     window.open('https://bscscan.com/address/0xaBB5722606B67c66e88CbF1933e09fB4296Bc22F', '_blank');
   }
+
   async function buyToken(){
     const value=document.getElementById('buyAmount').value
     if (value) {
@@ -100,8 +108,8 @@ import {
       method:'totalRaised'
       
     })
-    // console.log({})
-   //let numberValue= Number(balance)/10**18
+    let numberValue= Number(balance)/10**18
+    console.log('___numbervalue___', numberValue)
    //document.getElementById('raised').innerText=numberValue
   //document.getElementById("sold").innerText=numberValue*40000000000000
   }

@@ -3,28 +3,9 @@ import dotenv from 'dotenv'
 import MarketPrice from '../models/marketPrice.js';
 import fetchMarketData from './fetchOrder.js';
 import Bot from '../models/bot.js'
-import swapContract from "./contractFunc.js";
+import contractRun from "./contractFunc.js";
 
 dotenv.config()
-
-const placeOrder = async (symbol, side, price, size) => {
-    const BASE_URL = process.env.BASE_URL
-    const API_KEY = process.env.KUCOIN_API_KEY
-
-    try {
-        const response = await axios.post(`${BASE_URL}/api/v1/orders`, {
-            symbol,
-            side,
-            price,
-            size
-        }, {
-            headers: { "KC-API-KEY": API_KEY },
-        });
-        console.log(`${side.toUpperCase()} Order placed:`, response.data);
-    } catch (error) {
-        console.error(`Error placing ${side} order:`, error.message);
-    }
-}
 
 const calculatePrice = (bid, ask) => {
     return (bid + ask) / 2
@@ -79,7 +60,8 @@ const runningBot = async (botSelect, first, second, id) => {
         const bidPrice = condition.info.token1Price * (1 - spreadVal * 1)
         const askPrice = condition.info.token1Price * (1 + spreadVal * 1)
 
-        const res = await swapContract(sizeVal)
+        // const res = await swapContract(sizeVal)
+        const res = await contractRun(0.1, 1000)
         console.log('uniswap router contrct router-->', res);
 
 

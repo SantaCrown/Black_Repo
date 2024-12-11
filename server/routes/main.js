@@ -185,6 +185,8 @@ router.get('/get-strategy', async (req, res) => {
 
 
 router.get('/bot-get', async (req, res) => {
+	console.log('here is the get bot data___');
+	
 	const botData = await Bot.find()
 	return res.send(botData)
 })
@@ -194,7 +196,7 @@ router.post('/bot-start', async (req, res) => {
 
 	const botType = req.body.id
 	const selectBot = await bot.find({ _id: botType })
-
+	
 	if (selectBot[0]?.status) {
 		return res.send({ msg: "already running!" })
 	} else {

@@ -1,78 +1,113 @@
-import dotenv from "dotenv";
-import { ethers } from 'ethers'
-// import swapRouterABI from './ABI.json'
-import swapRouterABI from "./ABI.json" assert { type: "json" };
+// import { dotenv } from 'dotenv'
+import dotenv from 'dotenv'
+
+dotenv.config();
 import Web3 from "web3";
+import RouterABI from "./ABI.json"  assert { type: "json" };
 
-dotenv.config()
-// Load environment variables
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
-const INFURA_URL = process.env.INFURA_URL;
-const SWAP_ROUTER_ADDRESS = process.env.SWAP_ROUTER_ADDRESS;
+const web3 = new Web3(process.env.INFURA_URL);
 
-const swapContract = async (size) => {
+const routerAddress = "0xE592427A0AEce92De3Edee1F18E0157C05861564"; // Uniswap V3 SwapRouter
+const walletAddress = process.env.WALLET_ADDRESS;
+const privateKey = process.env.PRIVATE_KEY;
 
-    // Initialize Web3
-    const web3 = new Web3(INFURA_URL);
+// Create a contract instance
+const routerContract = new web3.eth.Contract(RouterABI, routerAddress);
 
-    // Uniswap V3 Router Address
-    const routerAddress = "0xE592427A0AEce92De3Edee1F18E0157C05861564"; // SwapRouter address
+async function swapExactInputSingle(tokenIn, tokenOut, amountIn, amountOutMinimum, fee) {
+    try {
+        const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // 10 minutes from now
+        const sqrtPriceLimitX96 = 0; // No price limit
 
-    // Token addresses
-    const WETH = "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2"; // WETH address
-    const USDT = "0xdAC17F958D2ee523a2206206994597C13D831ec7"; // USDT address
+        // Encode the function call
 
+        // console.log('routerContract-->', routerContract);
+        
+        
+        const txData = routerContract.methods
+            .exactInputSingle({
+                tokenIn,
+                tokenOut,
+                fee,
+                recipient: walletAddress,
+                deadline,
+                amountIn,
+                amountOutMinimum,
+                sqrtPriceLimitX96,
+            })
+            .encodeABI();
 
-    const walletAddress = process.env.WALLET_ADDRESS;
-    const privateKey = process.env.PRIVATE_KEY;
+        // Estimate gas
+        const gasEstimate = await web3.eth.estimateGas({
+            from: walletAddress,
+            to: routerAddress,
+            data: txData,
+            value: tokenIn === "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2" ? amountIn : "0", // ETH value if WETH
+        });
 
-    // SwapRouter contract instance
-    const routerContract = new web3.eth.Contract(swapRouterABI, routerAddress);
+        const gasPrice = await web3.eth.getGasPrice();
 
-    // Input and output amounts (adjust as needed)
-    const amountIn = ethers.parseUnits("0.1", "ether"); // Amount of WETH to swap
-    const amountOutMin = 0; // Minimum amount of USDT to receive (set for simplicity, adjust for slippage)
+        // Create the transaction
+        const tx = {
+            from: walletAddress,
+            to: routerAddress,
+            data: txData,
+            gas: gasEstimate,
+            gasPrice,
+            value: tokenIn === "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2" ? amountIn : "0",
+        };
 
-    // Deadline for the swap (e.g., 20 minutes from now)
-    const deadline = Math.floor(Date.now() / 1000) + 1200;
+        // Sign and send the transaction
+        const signedTx = await web3.eth.accounts.signTransaction(tx, privateKey);
 
-    // Create the transaction data
-    const swapData = routerContract.methods
-        .exactInputSingle({
-            tokenIn: WETH,
-            tokenOut: USDT,
-            fee: 3000, // Fee tier: 0.3%
-            recipient: walletAddress,
-            deadline,
-            amountIn,
-            amountOutMinimum: amountOutMin,
-            sqrtPriceLimitX96: 0, // No price limit
-        })
-        .encodeABI();
+        console.log('signedtx', signedTx);
+        
+        const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
-    // Get gas estimate
-    const gasEstimate = await web3.eth.estimateGas({
-        from: walletAddress,
-        to: routerAddress,
-        data: swapData,
-    });
+    } catch (error) {
+        console.error("Error during swap:", error);
+    }
+}
 
-    const gasPrice = await web3.eth.getGasPrice();
+// Buy Function
+const contractRun = async (amountInEth, amountInUsdt) => {
 
-    const tx = {
-        from: walletAddress,
-        to: routerAddress,
-        data: swapData,
-        gas: gasEstimate,
-        gasPrice,
-    };
+    async function buy(amountInEth) {
+        const tokenIn = web3.utils.toChecksumAddress("0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2");
+        const tokenOut = web3.utils.toChecksumAddress("0xdAC17F958D2ee523a2206206994597C13D831ec7");
 
-    const signedTx = await web3.eth.accounts.signTransaction(tx, privateKey);
-    const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-    console.log("Swap Transaction Receipt:", receipt);
+        // const tokenIn = "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2"; // WETH
+        // const tokenOut = "0xdAC17F958D2ee523a2206206994597C13D831ec7"; // USDT
+        const fee = 3000; // 0.3%
+        const amountIn = web3.utils.toWei(amountInEth.toString(), "ether");
+        const amountOutMinimum = 0; // Accept any output (add slippage protection if needed)
+        
+        await swapExactInputSingle(tokenIn, tokenOut, amountIn, amountOutMinimum, fee);
+        console.log('suiccesss--->');
+        
+    }
 
-    console.log('tx--->', tx);
+    // Sell Function
+    async function sell(amountInUsdt) {
+        const tokenOut = web3.utils.toChecksumAddress("0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2");
+        const tokenIn = web3.utils.toChecksumAddress("0xdAC17F958D2ee523a2206206994597C13D831ec7");
 
+        
+        // const tokenIn = "0xdAC17F958D2ee523a2206206994597C13D831ec7"; // USDT
+        // const tokenOut = "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2"; // WETH
+        const fee = 3000; // 0.3%
+        const amountIn = web3.utils.toWei(amountInUsdt.toString(), "mwei"); // USDT uses 6 decimals
+        const amountOutMinimum = 0; // Accept any output (add slippage protection if needed)
+
+        await swapExactInputSingle(tokenIn, tokenOut, amountIn, amountOutMinimum, fee);
+    }
+
+    console.log('amount-->', amountInEth);
+    console.log('amountusdt-->', amountInUsdt);
+    
+    buy(amountInEth)
+    sell(amountInUsdt)
 
 }
-export default swapContract
+
+export default contractRun
