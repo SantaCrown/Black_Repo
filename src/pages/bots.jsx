@@ -147,6 +147,7 @@ function Bots() {
   const getBotAccount = async () => {
     const response = await axios.get('http://localhost:5000/api/bot-get')
     setGetBotInfo(response.data)
+    console.log('responsedat', response.data);
 
     const bot = response?.data || []
     const formData = bot?.map((item) => ((!item.status) ? {
@@ -187,9 +188,7 @@ function Bots() {
       </div> */}
 
       <div className='mt-10'>
-        <h2 className="heading-top">
-          Running Bot ...
-        </h2>
+
         <div className='mt-5'>
 
           <table className='w-full text-center text-white'>

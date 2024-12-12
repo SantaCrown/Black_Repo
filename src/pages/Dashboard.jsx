@@ -5,6 +5,7 @@ import Button from "../uielement/Button";
 import CandleChart from "../components/CandleChart/CandleChart";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 function Dashboard() {
   const InfoIco = Info;
   const EthIco = Eth;
@@ -14,6 +15,29 @@ function Dashboard() {
   const navigate = useNavigate();
 
   const [token, setToken] = useState(null);
+  const [botAccount, setBotAccount] = useState(null)
+  const [state, setState] = useState(true)
+  const [getBotInfo, setGetBotInfo] = useState('')
+
+  const moveTo = () => {
+    navigate('/strategies')
+  }
+
+  const getAccount = async () => {
+    const response = await axios.get('http://localhost:5000/api/bot-get')
+    setGetBotInfo(response.data)
+    const bot = response?.data || []
+    const formData = bot?.map((item) => ((!item.status) ? {
+      value: item._id,
+      label: item.botName
+    } : {}))
+
+    setBotAccount(formData)
+  }
+
+  useEffect(() => {
+    getAccount()
+  }, [state])
 
   useEffect(() => {
     // Get token from query params
@@ -27,6 +51,7 @@ function Dashboard() {
       // Clear the query parameter from the URL
       window.history.replaceState(null, '', window.location.pathname);
       window.location.href = '/dashboard'; // Redirect after login
+
     } else if (localStorage.getItem('token')) {
       // navigate('/dashboard')
       setToken(localStorage.getItem('token'));
@@ -36,39 +61,39 @@ function Dashboard() {
       navigate('/login');
     }
   }, [navigate, token]);
+
   return (
     <div>
       <h2 className="heading-top">Dashboard</h2>
       <div className="conatiner-grid cards">
-        <Card heading="Bots">
-          <Notes
-            className="bot-dash"
-            icon={<InfoIco />}
-            discription="No bots are currently running. Try one of our examples or check out strategies from the community to start creating a bot."
-          />
-          <ul className="list-data-bot">
-            <li>
-              <span>+</span>
-              <p>Cross Exchange Market Strategy</p>
-            </li>
-            <li>
-              <span>+</span>
-              <p>Basic Arbitrage</p>
-            </li>
-            <li>
-              <span>+</span>
-              <p>Triangular Arbitrage</p>
-            </li>
-            <li>
-              <span>+</span>
-              <p>Basic Market Making</p>
-            </li>
-          </ul>
-          <Button buttonType="link" className="default-btn">Explore More Stratiges</Button>
+
+        <Card heading="Bots" className = 'relative'>
+
+          <div className="list-data-bot">
+            {
+              !getBotInfo ?
+                <Notes
+                  className="bot-dash"
+                  icon={<InfoIco />}
+                  discription="No bots are currently running. Try one of our examples or check out strategies from the community to start creating a bot."
+                />
+                : getBotInfo.map((item, key) => (
+                  <div index={key} className="text-white flex items-center gap-1 text-yellow-300">
+                    <span>+</span>
+                    <p>{item?.botName}</p>
+                  </div>
+                ))
+            }
+
+
+          </div>
+          <Button handler={moveTo} className="default-btn" >Explore More Stratiges</Button>
         </Card>
+
         <Card heading="Monthly (P&L)" >
           <CandleChart />
         </Card>
+
         <Card heading="Balances">
           <div className="table-bar">
             <div className="head">
@@ -113,6 +138,7 @@ function Dashboard() {
             </div>
           </div>
         </Card>
+
         <Card heading="Your Portfolio" otherInfo="$12544.44">
           <div className="tokens-status">
             <div className="token">
@@ -138,6 +164,7 @@ function Dashboard() {
 
           </div>
         </Card>
+
       </div>
     </div>
   );

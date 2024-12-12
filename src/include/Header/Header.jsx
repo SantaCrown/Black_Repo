@@ -10,20 +10,17 @@ import {
   WagmiCoreChains,
   WagmiCoreConnectors,
 } from "https://unpkg.com/@web3modal/ethereum@2.6.2";
-// import { parseEther } from 'https://cdn.jsdelivr.net/npm/viem@1.21.4/_cjs/index.min.js'
-
 import { Web3Modal } from "https://unpkg.com/@web3modal/html@2.6.2";
-const { bsc } = WagmiCoreChains;
-console.log({WagmiCoreChains});
-const { configureChains, createConfig, getAccount, readContract,fetchBalance ,sendTransaction}  = WagmiCore;
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setAccount } from "../../redux/slices/swapSlice";
 
-// 1. Define chains
+const { bsc } = WagmiCoreChains;
+const { configureChains, createConfig, getAccount, readContract, fetchBalance, sendTransaction } = WagmiCore;
 const chains = [bsc];
 const projectId = "2aca272d18deb10ff748260da5f78bfd";
-
-// 2. Configure wagmi client
-
 const { publicClient } = configureChains(chains, [w3mProvider({ projectId })]);
+
 const wagmiConfig = createConfig({
   autoConnect: true,
   connectors: [
@@ -38,8 +35,12 @@ const wagmiConfig = createConfig({
   publicClient,
 });
 
-// 3. Create ethereum and modal clients
-const ethereumClient = new EthereumClient(wagmiConfig, chains);
+let ethereumClient = new EthereumClient(wagmiConfig, chains);
+
+console.log('ethereumClient-->', ethereumClient);
+
+
+
 export const web3Modal = new Web3Modal(
   {
     projectId,
@@ -49,8 +50,43 @@ export const web3Modal = new Web3Modal(
   },
   ethereumClient
 )
-function Header({ hendlmobilemenu }) {
 
+// async function getWalletBalance() {
+
+
+//   try {
+//     // Get the connected account
+//     const account = getAccount();
+//     console.log('header accout', account);
+
+//     if (!account.isConnected) {
+//       console.log("Wallet not connected");
+//       return;
+//     }
+
+//     const walletAddress = account.address;
+
+//     // Fetch the wallet balance
+//     const balance = await fetchBalance({
+//       address: walletAddress, // Connected wallet address
+//       chainId: bsc.id,        // Specify the chain ID
+//     });
+
+//     console.log(`Wallet Address: ${walletAddress}`);
+//     console.log(`Balance: ${balance.formatted} ${balance.symbol}`);
+//     return { walletAddress, balance: `${balance.formatted} ${balance.symbol}` };
+//   } catch (error) {
+//     console.error("Error fetching wallet balance:", error);
+//   }
+// }
+
+const Header = ({ hendlmobilemenu }) => {
+  const dispatch = useDispatch()
+  dispatch(setAccount(ethereumClient))
+
+  // useEffect(()=> {
+  //   getWalletBalance()
+  // }, [])
 
   return (
     <Router>
@@ -58,14 +94,13 @@ function Header({ hendlmobilemenu }) {
         <nav>
           <Link to="/" className="blacklemon-app-logo"><img src={getImgURL("logo.png")} /></Link>
           <ul className="end-menu">
-          <li>  <w3m-core-button></w3m-core-button></li>
+            <li><w3m-core-button></w3m-core-button></li>
             <li><Link to="/community">Community</Link></li>
             <li><Link to="/documentation">Documentation</Link></li>
             <li><Link to="/tnc">Terms & Conditions</Link></li>
             <li><LogoutButton></LogoutButton></li>
           </ul>
           <div className="mob-menu"> <Link onClick={hendlmobilemenu} itemType="button"><MenuIcon /></Link></div>
-
         </nav>
       </header>
     </Router>

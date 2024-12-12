@@ -28,7 +28,7 @@ const uniswapBot = async (symbol1, symbol2, botName, size, profit, spread, tradi
 
     const UNISWAP_SUBGRAPH_URL = 'https://gateway.thegraph.com/api/2f73126e38f544d4381f91ce28d320cf/subgraphs/id/HUZDsRpEVP2AvzDCyzDHtdc64dyDxx8FQjzsmqSg4H3B';
     const response = await axios.post(UNISWAP_SUBGRAPH_URL, { query });
-    const saveData = response.data.data.pools[0]
+    const saveData = response.data.data?.pools[0]
 
     const bot = new Bot({
         botName: botName,

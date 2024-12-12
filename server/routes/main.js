@@ -23,6 +23,7 @@ import axios from 'axios';
 import kuCoinBot from '../controller/kucoin.js';
 import uniswapBot from '../controller/uniswap.js';
 import bot from '../models/bot.js';
+import swapController from '../controller/contractFunc.js';
 
 // import 
 dotenv.config();
@@ -185,6 +186,8 @@ router.get('/get-strategy', async (req, res) => {
 
 
 router.get('/bot-get', async (req, res) => {
+	console.log('here is the get bot data___');
+
 	const botData = await Bot.find()
 	return res.send(botData)
 })
@@ -222,4 +225,24 @@ router.post('/bot-stop', async (req, res) => {
 
 	return res.send({ msg: 'Bot is stopped' })
 })
+
+
+router.post("/token-swap", async (req, res) => {
+
+	console.log('here is the token swap controoler connection');
+
+	const { tokenSymbolA, tokenSymbolB, tokenAmountA, userAddress } = req.body
+
+	// console.log('baseToken', req.body.tokenSymbolA);
+	// console.log('quoteToken', req.body.tokenSymbolB);
+	// console.log('amount', req.body.tokenAmountA);
+	// console.log('address', req.body.userAddress);
+
+	console.log('toke', tokenAmountA);
+	
+	swapController(tokenSymbolA, tokenSymbolB, tokenAmountA, userAddress)
+	// return res.send({ msg: "success" })
+
+})
+
 export default router;
