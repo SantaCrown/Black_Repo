@@ -26,6 +26,11 @@ function Sidebar({ menuState }) {
       link: "/ppm-simple",
     },
     {
+      name: "🔑 AMM uniswap",
+
+      link: "/uniswap",
+    },
+    {
       name: "Bots",
       icon: <BotIcon />,
       link: "/bots",

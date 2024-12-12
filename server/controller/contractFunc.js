@@ -1,113 +1,54 @@
-// import { dotenv } from 'dotenv'
-import dotenv from 'dotenv'
+import { ethers } from "ethers";
+import SwapRouterABI from "./ABI.json" assert { type: "json" };
+import EthABI from "./eth.json" assert { type: "json" };
 
-dotenv.config();
-import Web3 from "web3";
-import RouterABI from "./ABI.json"  assert { type: "json" };
-
-const web3 = new Web3(process.env.INFURA_URL);
-
-const routerAddress = "0xE592427A0AEce92De3Edee1F18E0157C05861564"; // Uniswap V3 SwapRouter
-const walletAddress = process.env.WALLET_ADDRESS;
-const privateKey = process.env.PRIVATE_KEY;
-
-// Create a contract instance
-const routerContract = new web3.eth.Contract(RouterABI, routerAddress);
-
-async function swapExactInputSingle(tokenIn, tokenOut, amountIn, amountOutMinimum, fee) {
+const swapController = async (baseToken, quoteToken, amount, address12) => {
     try {
-        const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // 10 minutes from now
-        const sqrtPriceLimitX96 = 0; // No price limit
+        const provider = new ethers.JsonRpcProvider(process.env.INFURA_URL);
+        const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+        const SWAP_ROUTER = process.env.SWAP_ROUTER_ADDRESS;
 
-        // Encode the function call
+        const swapRouterContract = new ethers.Contract(SWAP_ROUTER, SwapRouterABI, wallet);
+        const baseTokenAddress = ethers.getAddress(process.env.WETH_ADDRESS);
+        const quoteTokenAddress = ethers.getAddress(process.env.USDT_ADDRESS);
 
-        // console.log('routerContract-->', routerContract);
-        
-        
-        const txData = routerContract.methods
-            .exactInputSingle({
-                tokenIn,
-                tokenOut,
-                fee,
-                recipient: walletAddress,
-                deadline,
-                amountIn,
-                amountOutMinimum,
-                sqrtPriceLimitX96,
-            })
-            .encodeABI();
+        const tokenContract = new ethers.Contract(baseTokenAddress, EthABI, wallet);
 
-        // Estimate gas
-        const gasEstimate = await web3.eth.estimateGas({
-            from: walletAddress,
-            to: routerAddress,
-            data: txData,
-            value: tokenIn === "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2" ? amountIn : "0", // ETH value if WETH
-        });
+        // Approve tokens for the router
+        console.log("Approving tokens...");
+        const approveTx = await tokenContract.approve(SWAP_ROUTER, ethers.parseEther(amount.toString()));
+        console.log("Approval transaction sent, waiting...");
+        await approveTx.wait();
+        console.log("Tokens approved:", approveTx.hash);
 
-        const gasPrice = await web3.eth.getGasPrice();
 
-        // Create the transaction
-        const tx = {
-            from: walletAddress,
-            to: routerAddress,
-            data: txData,
-            gas: gasEstimate,
-            gasPrice,
-            value: tokenIn === "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2" ? amountIn : "0",
+        // Prepare swap parameters
+        const params = {
+            tokenIn: baseTokenAddress,
+            tokenOut: quoteTokenAddress,
+            fee: 3000,
+            recipient: ethers.getAddress(process.env.WALLET_ADDRESS),
+            deadline: Math.floor(Date.now() / 1000) + 60 * 10,
+            amountIn: ethers.parseEther(amount),
+            amountOutMinimum: 0,
+            sqrtPriceLimitX96: 0,
         };
 
-        // Sign and send the transaction
-        const signedTx = await web3.eth.accounts.signTransaction(tx, privateKey);
+        // Execute the swap
+        console.log("Executing swap..........................................");
+        const swapTx = await swapRouterContract.exactInputSingle(params, {
+            gasLimit: 200000,
+        });
+        console.log("Swap transaction sent:::::::::::::::::::::::::", swapTx.hash);
 
-        console.log('signedtx', signedTx);
+        console.log('swapT____', swapTx);
         
-        const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+        const receipt = await swapTx.wait();
+        console.log("Swap completed:_______________________________", receipt.transactionHash);
 
-    } catch (error) {
-        console.error("Error during swap:", error);
+    } catch (err) {
+        console.error("Error during swap process:", err);
     }
-}
+};
 
-// Buy Function
-const contractRun = async (amountInEth, amountInUsdt) => {
-
-    async function buy(amountInEth) {
-        const tokenIn = web3.utils.toChecksumAddress("0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2");
-        const tokenOut = web3.utils.toChecksumAddress("0xdAC17F958D2ee523a2206206994597C13D831ec7");
-
-        // const tokenIn = "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2"; // WETH
-        // const tokenOut = "0xdAC17F958D2ee523a2206206994597C13D831ec7"; // USDT
-        const fee = 3000; // 0.3%
-        const amountIn = web3.utils.toWei(amountInEth.toString(), "ether");
-        const amountOutMinimum = 0; // Accept any output (add slippage protection if needed)
-        
-        await swapExactInputSingle(tokenIn, tokenOut, amountIn, amountOutMinimum, fee);
-        console.log('suiccesss--->');
-        
-    }
-
-    // Sell Function
-    async function sell(amountInUsdt) {
-        const tokenOut = web3.utils.toChecksumAddress("0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2");
-        const tokenIn = web3.utils.toChecksumAddress("0xdAC17F958D2ee523a2206206994597C13D831ec7");
-
-        
-        // const tokenIn = "0xdAC17F958D2ee523a2206206994597C13D831ec7"; // USDT
-        // const tokenOut = "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2"; // WETH
-        const fee = 3000; // 0.3%
-        const amountIn = web3.utils.toWei(amountInUsdt.toString(), "mwei"); // USDT uses 6 decimals
-        const amountOutMinimum = 0; // Accept any output (add slippage protection if needed)
-
-        await swapExactInputSingle(tokenIn, tokenOut, amountIn, amountOutMinimum, fee);
-    }
-
-    console.log('amount-->', amountInEth);
-    console.log('amountusdt-->', amountInUsdt);
-    
-    buy(amountInEth)
-    sell(amountInUsdt)
-
-}
-
-export default contractRun
+export default swapController;

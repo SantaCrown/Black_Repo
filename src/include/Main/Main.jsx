@@ -12,8 +12,10 @@ import Signup from '../../components/Signup';
 import Login from '../../components/Login';
 import ProtectedRoute from '../../components/ProtectedRoute ';
 import Tnc from '../../components/tnc';
+import Uniswap from '../../pages/Uniswap';
 
 function Main({ menuState }) {
+
   // Manage login state
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
 
@@ -39,15 +41,15 @@ function Main({ menuState }) {
           <Routes>
             {/* Public Routes */}
             <Route path="/signup" element={<Signup />} />
-         <Route path="/login" element={<Login />} />
-           
+            <Route path="/login" element={<Login />} />
+
 
             {/* Protected Routes */}
             <Route
               exact
               path="/tnc"
               element={
-                <Tnc/>
+                <Tnc />
               }
             />
             <Route
@@ -57,6 +59,15 @@ function Main({ menuState }) {
                 <Dashboard />
               }
             />
+
+            <Route
+              exact
+              path="/uniswap"
+              element={
+                <Uniswap />
+              }
+            />
+
             <Route
               exact
               path="/credentials"
