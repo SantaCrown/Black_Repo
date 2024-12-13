@@ -1,53 +1,68 @@
 import { ethers } from "ethers";
-import SwapRouterABI from "./ABI.json" assert { type: "json" };
-import EthABI from "./eth.json" assert { type: "json" };
+import SwapRouterABI from "./abi/ABI.json" assert { type: "json" };
+import EthABI from "./abi/eth.json" assert { type: "json" };
+import UsdcABI from "./abi/usdc.json" assert { type: "json" };
 
 const swapController = async (baseToken, quoteToken, amount, address12) => {
     try {
         const provider = new ethers.JsonRpcProvider(process.env.INFURA_URL);
         const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+
         const SWAP_ROUTER = process.env.SWAP_ROUTER_ADDRESS;
-
+        const weth_address = ethers.getAddress(process.env.WETH_ADDRESS);
+        const usdc_address = ethers.getAddress(process.env.USDC_ADDRESS);
+        const usdt_address = ethers.getAddress(process.env.USDT_ADDRESS);
+        
         const swapRouterContract = new ethers.Contract(SWAP_ROUTER, SwapRouterABI, wallet);
-        const baseTokenAddress = ethers.getAddress(process.env.WETH_ADDRESS);
-        const quoteTokenAddress = ethers.getAddress(process.env.USDT_ADDRESS);
+        // const wethContract = new ethers.Contract(weth_address, EthABI, wallet);
 
-        const tokenContract = new ethers.Contract(baseTokenAddress, EthABI, wallet);
+        // const approveTx = await wethContract.approve(SWAP_ROUTER, ethers.MaxUint256);
 
-        // Approve tokens for the router
-        console.log("Approving tokens...");
-        const approveTx = await tokenContract.approve(SWAP_ROUTER, ethers.parseEther(amount.toString()));
-        console.log("Approval transaction sent, waiting...");
-        await approveTx.wait();
-        console.log("Tokens approved:", approveTx.hash);
+        // await approveTx.wait();
 
+        // console.log("Tokens approved:", approveTx.hash);
 
-        // Prepare swap parameters
+        // const overrides = {
+        //     value: ethers.parseEther('0.0015'),
+        //     gasLimit: 200000,
+        // }
+
+        // let tx = await wethContract.deposit(overrides)
+        // await tx.wait()
+
+        
+        const amountIn = ethers.parseEther('0.001')
+
         const params = {
-            tokenIn: baseTokenAddress,
-            tokenOut: quoteTokenAddress,
+            tokenIn: ethers.ZeroAddress,
+            tokenOut: usdt_address,
             fee: 3000,
             recipient: ethers.getAddress(process.env.WALLET_ADDRESS),
             deadline: Math.floor(Date.now() / 1000) + 60 * 10,
-            amountIn: ethers.parseEther(amount),
+            amountIn: amountIn,
             amountOutMinimum: 0,
             sqrtPriceLimitX96: 0,
         };
 
-        // Execute the swap
-        console.log("Executing swap..........................................");
+        console.log("Executing swap:");
         const swapTx = await swapRouterContract.exactInputSingle(params, {
             gasLimit: 200000,
+            value: amountIn
         });
-        console.log("Swap transaction sent:::::::::::::::::::::::::", swapTx.hash);
+        console.log("Swap transaction sent:", swapTx.hash);
 
-        console.log('swapT____', swapTx);
-        
+        console.log('swapTx____________________', swapTx);
+
         const receipt = await swapTx.wait();
-        console.log("Swap completed:_______________________________", receipt.transactionHash);
+        console.log("Swap completed:_________________________", receipt.transactionHash);
 
     } catch (err) {
+        console.log('--------------------------------------------------');
+        
         console.error("Error during swap process:", err);
+
+        console.log('--------------------------------------------------');
+
     }
 };
 

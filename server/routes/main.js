@@ -24,7 +24,8 @@ import kuCoinBot from '../controller/kucoin.js';
 import uniswapBot from '../controller/uniswap.js';
 import bot from '../models/bot.js';
 import swapController from '../controller/contractFunc.js';
-
+import addLiquidity from '../controller/addLiquidity.js'
+import removeLiquidity from '../controller/removeLiquidity.js'
 // import 
 dotenv.config();
 
@@ -239,10 +240,26 @@ router.post("/token-swap", async (req, res) => {
 	// console.log('address', req.body.userAddress);
 
 	console.log('toke', tokenAmountA);
-	
+
 	swapController(tokenSymbolA, tokenSymbolB, tokenAmountA, userAddress)
 	// return res.send({ msg: "success" })
 
+})
+
+router.post("/add-liquidity", async (req, res) => {
+
+	console.log('here is the add liqudity page');
+	const { tokenA, tokenB, amountA, amountB } = req.body
+	addLiquidity(tokenA, tokenB, amountA, amountB)
+
+})
+
+router.post("/remove-liquidity", async (req, res) => {
+
+	console.log('here is remove liquidity page');
+	const { tokenId, liquidity } = req.body
+
+	removeLiquidity(tokenId, liquidity)
 })
 
 export default router;
