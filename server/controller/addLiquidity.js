@@ -7,7 +7,10 @@ const addLiquidity = async (
     const provider = new ethers.JsonRpcProvider(process.env.INFURA_URL);
 
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+
     const nft_address = ethers.getAddress(process.env.NFT_ADDRESS)
+    const usdt_address = ethers.getAddress(process.env.USDT_ADDRESS)
+
     const positionManager = new ethers.Contract(
         nft_address, // NonfungiblePositionManager address
         abi, // Add ABI here
@@ -15,8 +18,8 @@ const addLiquidity = async (
     );
 
     const params = {
-        token0: tokenA,
-        token1: tokenB,
+        token0: usdt_address,
+        token1: ethers.ZeroAddress,
         fee: 3000,
         tickLower: -887220,
         tickUpper: 887220,
