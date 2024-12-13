@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from 'axios'
 import { useSelector } from "react-redux";
+import { addLiquidity } from "../v2/scripts/add_liquidity";
 
 const Uniswap = () => {
     const account = useSelector((state) => state.swap.account);
@@ -12,66 +13,36 @@ const Uniswap = () => {
     const [tokenAmountA, setTokenAmountA] = useState('')
     const [recipient, setRecipient] = useState('')
 
-    const handleSwap = async () => {
-        if (!userAccount) return alert("MetaMask is not installed");
-
-        try {
-            //   const provider = new ethers.providers.Web3Provider(window.ethereum);
-            //   const signer = provider.getSigner();
-            //   const userAddress = await signer.getAddress();
-
-            console.log('here is the swap controller');
-
-
-            const response = await axios.post("http://localhost:5000/api/token-swap", {
-                tokenSymbolA,
-                tokenSymbolB,
-                tokenAmountA,
-                userAddress,
-            });
-
-            console.log('response', response);
-
-            // if (response.data.msg === "success") {
-            //     alert(`Swap Successful! Transaction Hash: ${response.data.txHash}`);
-            // } else {
-            //     alert(`Swap Failed: ${response.data.message}`);
-            // }
-        } catch (error) {
-            console.error(error);
-            // alert("An error occurred while swapping tokens.");
-        }
-    };
-
     // add liquidity part
 
-    const [tokenA, setTokenA] = useState("");
-    const [tokenB, setTokenB] = useState("");
-    const [amountA, setAmountA] = useState("");
-    const [amountB, setAmountB] = useState("");
-    const addLiquidity = async () => {
-        const response = await axios.post("http://localhost:5000/api/add-liquidity", {
-            tokenA,
-            tokenB,
-            amountA,
-            amountB
-        })
+    const [token0AddressForAddingLiquidity, setToken0AddressForAddingLiquidity] = useState("");
+    const [token1AddressForAddingLiquidity, setToken1AddressForAddingLiquidity] = useState("");
+    const [token0AmountForAddingLiquidity, setToken0AmountForAddingLiquidity] = useState();
+    const [token1AmountForAddingLiquidity, setToken1AmountForAddingLiquidity] = useState();
 
-        console.log('response', response);
-
+    const handleSwap = async () => {
+        console.log('swap hande');
+        
     }
-    // remove liquidity part
+    const handleAddLiquidity = async () => {
+        console.log('token0AddressForAddingLiquidity', token0AddressForAddingLiquidity);
+        
+        await addLiquidity(
+            token0AddressForAddingLiquidity,
+            token1AddressForAddingLiquidity,
+            token0AmountForAddingLiquidity,
+            token1AmountForAddingLiquidity
+        )
+    }
 
     const [tokenId, setTokenId] = useState("");
     const [liquidity, setLiquidity] = useState("");
 
     const removeLiquidity = async () => {
-        const response = await axios.post("http://localhost:5000/api/remove-liquidity", {
-            tokenId,
-            liquidity
-        })
-
+       console.log('here is the remove page');
+       
     }
+
     return (
         <div>
             <div className="text-center text-white">
@@ -95,11 +66,35 @@ const Uniswap = () => {
             </div>
             <div className="text-white text-centeer">Add</div>
             <div className="flex flex-col gap-2 ">
-                <input className='text-white border-[1px] border-white rounded-md bg-black' type="text"  value={tokenA} onChange={(e) => setTokenA(e.target.value)} placeholder="Token A Address" />
-                <input className='text-white border-[1px] border-white rounded-md bg-black' type="text"  value={tokenB} onChange={(e) => setTokenB(e.target.value)} placeholder="Token B Address" />
-                <input className='text-white border-[1px] border-white rounded-md bg-black' type="text"  value={amountA} onChange={(e) => setAmountA(e.target.value)} placeholder="Amount of Token A" />
-                <input className='text-white border-[1px] border-white rounded-md bg-black' type="text"  value={amountB} onChange={(e) => setAmountB(e.target.value)} placeholder="Amount of Token B" />
-                <button onClick={addLiquidity} className=" text-white border-[1px] border-green-500" >Add Liquidity</button>
+                <input
+                    className='text-white border-[1px] border-white rounded-md bg-black'
+                    type="text" 
+                    value={token0AddressForAddingLiquidity}
+                    onChange={(e) => setToken0AddressForAddingLiquidity(e.target.value)}
+                    placeholder="Token A Address"
+                />
+                <input
+                    className='text-white border-[1px] border-white rounded-md bg-black'
+                    type="text"
+                    value={token1AddressForAddingLiquidity}
+                    onChange={(e) => setToken1AddressForAddingLiquidity(e.target.value)}
+                    placeholder="Token B Address"
+                />
+                <input
+                    className='text-white border-[1px] border-white rounded-md bg-black'
+                    type="number"
+                    value={token0AmountForAddingLiquidity}
+                    onChange={(e) => setToken0AmountForAddingLiquidity(e.target.value)}
+                    placeholder="Amount of Token A"
+                />
+                <input
+                    className='text-white border-[1px] border-white rounded-md bg-black'
+                    type="number"
+                    value={token1AmountForAddingLiquidity}
+                    onChange={(e) => setToken1AmountForAddingLiquidity(e.target.value)}
+                    placeholder="Amount of Token B"
+                />
+                <button onClick={handleAddLiquidity} className=" text-white border-[1px] border-green-500" >Add Liquidity</button>
             </div>
 
 
