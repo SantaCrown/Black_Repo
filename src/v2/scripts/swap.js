@@ -2,20 +2,22 @@ import { ethers } from "ethers"
 import { Token } from "@uniswap/sdk-core"
 import { Pair } from "@uniswap/v2-sdk"
 
-import { ERC20_ABI, getWethTokenAddress, ROUTER_ABI } from "../abi"
+import { ERC20_ABI, ROUTER_ABI } from "../abi"
 import { getProvider, getWallet } from "../providers"
 import { CurrentConfig, TO_ADDRESS } from "../config"
 
 import { SEPOLIA_CHAIN_ID } from "../constants"
 
-const token0Address = CurrentConfig.token.token0Address
-const token1Address = CurrentConfig.token.token1Address
-
 const v2RouterAddress = CurrentConfig.env == 'Mainnet'
   ? '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'
   : '0xeE567Fe1712Faf6149d80dA1E6934E354124CfE3'
 
-export async function swapTokenForExactToken() {
+export async function swapTokenForExactToken(
+  token0Address,
+  token1Address,
+  token0AmountForSwapMax,
+  token1AmountForSwap) {
+
   if (!token0Address || !token1Address) {
     throw new Error(`Missing required environment variables:
       TOKEN0_ADDRESS: ${token0Address ? 'Set' : 'Not Set'}
@@ -23,9 +25,12 @@ export async function swapTokenForExactToken() {
     `);
   }
 
-  const token0Contract = new ethers.Contract(token0Address, ERC20_ABI, getProvider())
-  const token1Contract = new ethers.Contract(token1Address, ERC20_ABI, getProvider())
-  
+  console.log('token0 address: ', token0Address)
+  console.log('token1 address: ', token1Address)
+
+  const token0Contract = new ethers.Contract(token0Address, ERC20_ABI, getWallet())
+  const token1Contract = new ethers.Contract(token1Address, ERC20_ABI, getWallet())
+
   const token0Decimals = await token0Contract.decimals()
   const token1Decimals = await token1Contract.decimals()
 
@@ -57,17 +62,23 @@ export async function swapTokenForExactToken() {
       return false
     }
 
-    let amountOut = CurrentConfig.token.token1AmountForSwap
+    let amountOut = token1AmountForSwap
     let expectedAmountIn = reserves[0] - (reserves[0] * reserves[1]) / (reserves[1] + BigInt(amountOut))
-    let amountInMax = CurrentConfig.token.token0AmountForSwapMax;
+    let amountInMax = token0AmountForSwapMax;
 
-    console.log(`Swapping ${expectedAmountIn} ${token1.symbol} for ${amountOut} ${token0.symbol}`)
+    console.log("Approving tokens for router")
+    await token0Contract.approve(v2RouterAddress, amountInMax)
+    console.log("Token approved")
+
+    console.log(`Swapping ${expectedAmountIn} ${token0.symbol} for ${amountOut} ${token1.symbol}`)
 
     const routerContract = new ethers.Contract(v2RouterAddress, ROUTER_ABI, getWallet())
 
-    const path = [token1.address, token0.address]
+    const path = [token0.address, token1.address]
     const to = TO_ADDRESS
     const deadline = Math.floor(Date.now() / 1000) + 60 * 10
+
+    const gasLimit = 3000000n
 
     const tx = await routerContract.swapTokensForExactTokens(
       amountOut,
@@ -75,10 +86,26 @@ export async function swapTokenForExactToken() {
       path,
       to,
       deadline,
+      {
+        gasLimit
+      },
     )
 
-    await tx.wait()
+    console.log("Transaction sent. Hash:", tx.hash);
+
+    console.log('-----------------------------');
+    console.log('tx-->', tx);
+    console.log('-----------------------------');
+    
+    // Wait for the transaction to be mined
+    const receipt = await tx.wait();
+    console.log("Transaction mined. Receipt:", receipt);
+
+    // Access specific details if needed
+    console.log("Block Number:", receipt.blockNumber);
+    console.log("Gas Used:", receipt.gasUsed.toString());
     console.log("Swapped successfully")
+
     return true
 
   } catch (error) {

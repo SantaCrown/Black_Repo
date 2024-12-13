@@ -13,12 +13,8 @@ const v2RouterAddress = CurrentConfig.env == 'Mainnet'
   ? '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'
   : '0xeE567Fe1712Faf6149d80dA1E6934E354124CfE3'
 
-export async function addLiquidity(
-  token0Address,
-  token1Address,
-  token0Amount,
-  token1Amount
-) {
+export async function addLiquidity(token0Address, token1Address, 
+  token0Amount, token1Amount) {
 
   if (!token0Address || !token1Address) {
     throw new Error(`Missing required environment variables:
@@ -96,6 +92,7 @@ export async function addLiquidity(
 
     await tx.wait()
     console.log("Liquidity added successfully")
+    return 'success!'
 
   } catch (error) {
     console.log('Error adding liquidity ', error)
