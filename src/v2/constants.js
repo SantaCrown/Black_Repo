@@ -1,0 +1,10 @@
+export const SEPOLIA_WETH_TOKEN_ADDRESS = '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9'
+export const MAINNET_WETH_TOKEN_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
+
+export const getWethTokenAddress = () => {
+  return CurrentConfig.env == Environment.MAINNET
+    ? MAINNET_WETH_TOKEN_ADDRESS
+    : SEPOLIA_WETH_TOKEN_ADDRESS
+}
+
+export const SEPOLIA_CHAIN_ID = 11155111
