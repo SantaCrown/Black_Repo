@@ -17,33 +17,31 @@ function Sidebar({ menuState }) {
     },
     {
       name: "🔑 Credentials",
-
       link: "/credentials",
     },
     {
-      name: "👨‍🏫 PMM Simple",
+      name: "👨‍🏫 PMM Strategy",
 
       link: "/ppm-simple",
-    },
-    {
-      name: "🔑 AMM uniswap",
-
-      link: "/uniswap",
     },
     {
       name: "Bots",
       icon: <BotIcon />,
       link: "/bots",
-      submenu: [
-        {
-          name: "Active Bots",
-          icon: "",
-          link: "/active-bots",
-        },
-      ],
+      // submenu: [
+      //   {
+      //     name: "Active Bots",
+      //     icon: "",
+      //     link: "/active-bots",
+      //   },
+      // ],
     },
     {
-      name: "Strategies",
+      name: "🔑 AMM Uniswap",
+      link: "/uniswap",
+    },
+    {
+      name: "Datas",
       icon: <IconStratiges />,
       link: "/strategies",
     },

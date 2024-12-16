@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react'
 import Card from "../components/Card/card";
 import InputType from "../uielement/InputType";
@@ -7,21 +6,19 @@ import { SettingIcon, ViewIcon, PlayIcon } from "../icons/icons";
 import axios from 'axios';
 import Popmsg from '../uielement/Popmsg';
 import DropDownSelect from '../uielement/DropDownSelect';
-
+import { useNavigate } from 'react-router-dom';
 
 function PpmSimple() {
-  const [buttonOpen, setButtonOpen] = useState(false)
 
+  const navigate = useNavigate()
+  const [buttonOpen, setButtonOpen] = useState(false)
   const [refreshT, setRefreshT] = useState(null)
   const [coolT, setCoolT] = useState(null)
+  const [mode, setMode] = useState(null)
 
   const handleClick = () => {
     setButtonOpen(!buttonOpen)
   }
-
-  const [mode, setMode] = useState(null)
-
-  console.log('mode', mode);
 
   function selectedValue(data) {
     setMode(data.value);
@@ -44,6 +41,8 @@ function PpmSimple() {
   const [popmsg, setPopmsg] = useState(null);
   const [error, setError] = useState(null);
   const [spread, setSpread] = useState(null);
+  const [tokenA, setTokenA] = useState(null)
+  const [tokenB, setTokenB] = useState(null)
 
   const addBotName = (val) => {
     setBotName(val.target.value)
@@ -69,14 +68,59 @@ function PpmSimple() {
     setSpread(event.target.value)
   }
 
-  const paperHandler = async () => {
+  const addTokenAMaxAmount = (event) => {
+    setTokenA(event.target.value)
+  }
+
+  const addTokenBSwapAmount = (event) => {
+    setTokenB(event.target.value)
+  }
+
+  const [checkboxes, setCheckboxes] = useState({
+    ETH: false,
+    XRP: false,
+    BTC: false,
+    USDT: false,
+  });
+
+  const [connectors, setConnectors] = useState({
+    Binance: false,
+    Kucoin: false,
+    Bybit: false,
+    UniSwap: false,
+  });
+
+  const handleConnector = (key) => {
+    const selectedCount = Object.values(connectors).filter((value) => value).length;
+    setConnectors((prev) => {
+      const newValue = !prev[key];
+      if (!newValue && selectedCount === 1) return prev;
+      return { ...prev, [key]: newValue };
+    });
+  };
+
+  const handleCheckboxChange = (key) => {
+    const selectedCount = Object.values(checkboxes).filter((value) => value).length;
+    setCheckboxes((prev) => {
+      const newValue = !prev[key];
+      if (!newValue && selectedCount === 2) return prev;
+      return { ...prev, [key]: newValue };
+    });
+  };
+
+  let connector = Object.keys(connectors).filter((key) => connectors[key]);
+
+  const saveFunc = async () => {
 
     const mode = "paper"
     const numberSize = parseFloat(size)
     const profitSize = parseFloat(profit)
     const spreadSize = parseFloat(spread)
     const selected = Object.keys(checkboxes).filter((key) => checkboxes[key]);
-    const connector = Object.keys(connectors).filter((key) => connectors[key]);
+    // const connector = Object.keys(connectors).filter((key) => connectors[key]);
+
+
+    console.log('conn', connector);
 
     if (!botName) {
       setError("bot name error")
@@ -121,6 +165,7 @@ function PpmSimple() {
       }, {});
     }
 
+
     if (botName && profit && size && !isNaN(numberSize) && !isNaN(profitSize) && !isNaN(spreadSize) && tradingValue && connectorValue) {
       console.log("sar");
 
@@ -134,107 +179,19 @@ function PpmSimple() {
           spread,
           mode,
           refreshT,
-          coolT
+          coolT,
+          tokenA,
+          tokenB,
         })
-      console.log(response.data);
-    }
-
-  }
-
-  const liveHandler = async () => {
-
-    const mode = "live"
-    const numberSize = parseFloat(size)
-    const profitSize = parseFloat(profit)
-    const selected = Object.keys(checkboxes).filter((key) => checkboxes[key]);
-    const connector = Object.keys(connectors).filter((key) => connectors[key]);
-
-    if (!botName) {
-      setError("bot name error")
-      setPopmsg("Bot name is required!")
-    }
-
-    if (!size || isNaN(numberSize)) {
-      setError("Trading size error")
-      setPopmsg("Trading Size is a valid number!")
-    }
-
-    if (!profit || isNaN(profitSize)) {
-      setError("Minimum Profitability error")
-      setPopmsg("Minimum Profitability is a valid number!")
-    }
-    let tradingValue;
-    let connectorValue;
-
-    if (selected.length !== 2) {
-      setError("Trading pair error")
-      setPopmsg("Trading Pair is required!")
-    } else {
-      tradingValue = selected.reduce((acc, key) => {
-        acc[key] = true;
-        return acc;
-      }, {});
-      console.log("tradingPair===>", tradingValue);
-    }
-
-    if (connector.length !== 1) {
-      setError("connector error")
-      setPopmsg("connector is required!")
-    } else {
-      connectorValue = connector.reduce((acc, key) => {
-        acc[key] = true;
-        return acc;
-      }, {});
-      console.log("===>", connectorValue);
-    }
-
-    if (botName && profit && size && !isNaN(numberSize) && !isNaN(profitSize) && tradingValue && connectorValue) {
-      console.log("sar");
-
-      const response = await axios.post('http://localhost:5000/api/bot-config',
-        {
-          botName,
-          connectorValue,
-          tradingValue,
-          size,
-          profit,
-          mode
-        })
-      console.log(response.data);
+      if (response.data?.msg === 'success') {
+        navigate('/bots')
+      }
     }
   }
 
-  const [checkboxes, setCheckboxes] = useState({
-    ETH: false,
-    XRP: false,
-    BTC: false,
-    USDT: false,
-  });
-
-  const [connectors, setConnectors] = useState({
-    Binance: false,
-    Kucoin: false,
-    Bybit: false,
-    UniSwap: false,
-  });
-
-  const handleConnector = (key) => {
-    const selectedCount = Object.values(connectors).filter((value) => value).length;
-    setConnectors((prev) => {
-      const newValue = !prev[key];
-      if (!newValue && selectedCount === 1) return prev;
-      return { ...prev, [key]: newValue };
-    });
-  };
-
-  const handleCheckboxChange = (key) => {
-    const selectedCount = Object.values(checkboxes).filter((value) => value).length;
-    setCheckboxes((prev) => {
-      const newValue = !prev[key];
-      if (!newValue && selectedCount === 2) return prev;
-      return { ...prev, [key]: newValue };
-    });
-  };
+  const cancelFunc = async () => {
+    console.log('here is cancel part');
+  }
 
   return (
     <div className="bots">
@@ -283,24 +240,6 @@ function PpmSimple() {
               ))}
             </div>
 
-            <div className="flex items-end bot-feild">
-              <InputType onInputChange={addSize} label="Trading Amount" type="text" icon="false" placeholder="e.g.1.0" />
-              <InputType onInputChange={addSpread} label="Spread" type="text" icon="false" placeholder="e.g.0.02" />
-              <div className="advance-set flex items-center" onClick={handleClick}>
-                <SettingIcon />
-                <p>Advanced Options</p>
-              </div>
-              {/* <div>
-                <h3>Select Mode</h3>
-
-                <div className="available-accounts">
-                  <DropDownSelect
-                    setSelectedVal={selectedValue}
-                    options={selectData} />
-                </div>
-              </div> */}
-            </div>
-
             <div className='bot-field mt-5'>
               <div className='table-bar'>
                 <div className='head'>
@@ -308,21 +247,41 @@ function PpmSimple() {
                 </div>
               </div>
               <div className='mt-5 flex justify-between gap-2'>
-
                 <InputType onInputChange={addProfit} label="Minimum Profit Margin" type="text" icon="false" placeholder="e.g.0.002" />
                 <InputType onInputChange={refreshTime} label="Refresh Time" type="text" icon="false" placeholder="e.g.0.002" />
                 <InputType onInputChange={coolTime} label="Stop Loss Cooldown Time" type="text" icon="false" placeholder="e.g.0.002" />
               </div>
             </div>
 
-            {buttonOpen && <div className="submit-con">
+            <div className="flex mt-5 gap-2 justify-between items-end">
+              <InputType className='w-full' onInputChange={addSize} label="Trading Amount" type="text" icon="false" placeholder="e.g.1.0" />
+              <InputType className='w-full' onInputChange={addSpread} label="Spread" type="text" icon="false" placeholder="e.g.0.02" />
+            </div>
+            {
+              connector.length && <div className='flex flex-col w-full mt-5 gap-5'>
+                <div className='table-bar'>
+                  <div className='head'>
+                    <p className='text-lg'>More Details ...</p>
+                  </div>
+                </div>
+                <div className='flex justify-between gap-2'>
+                  <InputType onInputChange={addTokenBSwapAmount} label="Token A Amount for Swaping" type="text" icon="false" placeholder="e.g.0.002" />
+                  <InputType onInputChange={addTokenAMaxAmount} label="Token B Limit Amount for Swaping" type="text" icon="false" placeholder="e.g.0.002" />
+                </div>
+              </div>
+            }
+
+            {/* {buttonOpen && <div className="submit-con"> */}
+            <div className='flex w-full justify-between gap-2 mt-5'>
+
               <Button
-                handler={paperHandler}
-                className="default-btn"><ViewIcon />Paper Trade</Button>
+                handler={cancelFunc}
+                className="w-full default-btn"><ViewIcon />Cancel</Button>
               <Button
-                handler={liveHandler}
-                className="default-btn"><PlayIcon />Live Trade</Button>
-            </div>}
+                handler={saveFunc}
+                className="w-full default-btn"><PlayIcon />Save</Button>
+            </div>
+            {/* </div>} */}
 
           </div>
         </Card>

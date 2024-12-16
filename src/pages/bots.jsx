@@ -163,7 +163,12 @@ function Bots() {
   }, [state])
 
   console.log('getbotinfo', getBotInfo);
-  console.log('botaccount-->', botAccount);
+
+  let infoData = [];
+  getBotInfo?.map((item, key) => {
+    return infoData[key] = item.info
+  })
+  console.log('botaccount-->', infoData);
 
 
   return (
@@ -172,25 +177,8 @@ function Bots() {
       <h2 className="heading-top">
         Bot Control
       </h2>
-      {/* <div>
-        <div className="available-accounts">
-          {botAccount.length > 0 ? <DropDownSelect
-            setSelectedVal={selectedValue}
-            options={botAccount} /> : "No account to delete"}
-          <Button
-            buttonType="button"
-            handler={botStart}
-            className="default-btn"
-          >
-            Start
-          </Button>
-        </div>
-      </div> */}
-
       <div className='mt-10'>
-
         <div className='mt-5'>
-
           <table className='w-full text-center text-white'>
             <thead>
               <tr>
@@ -240,6 +228,49 @@ function Bots() {
             </tbody>
           </table>
         </div>
+      </div>
+      <div>
+        Bot Details :
+      </div>
+      <div className='grid grid-cols-2 gap-5 justify-between'>
+        {
+
+          infoData &&
+          infoData?.map((ele) => (
+            <table className='text-left border-white border-[1px] rounded-md p-2 text-white text-lg'>
+              <thead className='p-2'>
+                <td className='p-1 border-[1px] border-white'>Field</td>
+                <td className='p-1 border-[1px] border-white'>Value</td>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className='p-1 border-[1px] border-white'>Fee :</td>
+                  <td className='p-1 border-[1px] border-white'>{Number(ele?.feeTier) / 10000} % </td>
+                </tr>
+                <tr>
+                  <td className='p-1 border-[1px] border-white'>Liquidity :</td>
+                  <td className='p-1 border-[1px] border-white'>{(Number(ele?.liquidity) / 1000000000000000000).toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td className='p-1 border-[1px] border-white'>SqrtPrice : </td>
+                  <td className='p-1 border-[1px] border-white'>{(Number(ele?.sqrtPrice) / Math.pow(2, 96)).toFixed(6)}</td>
+                </tr>
+                <tr>
+                  <td className='p-1 border-[1px] border-white'>Token0Price : </td>
+                  <td className='p-1 border-[1px] border-white'>{Number(ele?.token0Price).toFixed(4)}  {ele?.token1.symbol } / { ele?.token0.symbol }</td>
+                </tr>
+                <tr>
+                  <td className='p-1 border-[1px] border-white'>Token1price : </td>
+                  <td className='p-1 border-[1px] border-white'>{Number(ele?.token1Price).toFixed(1)} {ele?.token0.symbol } / { ele?.token1.symbol }</td>
+                </tr>
+                <tr>
+                  <td className='p-1 border-[1px] border-white'>VolumnUSO :</td>
+                  <td className='p-1 border-[1px] border-white'>${Number(ele?.volumeUSD).toFixed(2)} </td>
+                </tr>
+              </tbody>
+            </table>
+          ))
+        }
       </div>
     </div>
   );

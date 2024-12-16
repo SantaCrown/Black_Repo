@@ -9,9 +9,11 @@ const botSchema = new mongoose.Schema({
     mode: { type: String, required: true },
     status: { type: Boolean, default: false },
     botStyle: { type: String, required: true },
-    connector: { type:Object, required: true },
+    connector: { type: Object, required: true },
     trading: { type: Object, required: true },
-    info : {type:Object, required : true}
+    maxAmount: { type: String, default: '0' },
+    swapAmount: { type: String, default: '0' },
+    info: { type: Object, required: true }
 }, {
     timestamps: true
 });

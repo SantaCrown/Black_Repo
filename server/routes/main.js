@@ -23,10 +23,6 @@ import axios from 'axios';
 import kuCoinBot from '../controller/kucoin.js';
 import uniswapBot from '../controller/uniswap.js';
 import bot from '../models/bot.js';
-import swapController from '../controller/contractFunc.js';
-// import addLiquidity from '../controller/addLiquidity.js'
-// import removeLiquidity from '../controller/removeLiquidity.js'
-// import 
 dotenv.config();
 
 const router = express.Router();
@@ -107,17 +103,8 @@ router.post('/bot-config', async (req, res) => {
 	const trading = req.body.tradingValue
 	const refreshTime = req.body.refreshT
 	const coolTime = req.body.coolT
-
-
-	console.log('botName', botName);
-	console.log('size', size);
-	console.log('profit', profit);
-	console.log('spread', spread);
-	console.log('mode', mode);
-	console.log('connector', connector);
-	console.log('trading', trading);
-	console.log('refreshTime', refreshTime);
-	console.log('coolTime', coolTime);
+	const maxAmount = req.body.tokenA
+	const swapAmount = req.body.tokenB
 
 	try {
 		const key = Object.keys(connector).find(key => connector[key]);
@@ -150,7 +137,7 @@ router.post('/bot-config', async (req, res) => {
 
 		if (key.toLocaleLowerCase() === 'uniswap') {
 
-			uniswapBot(
+			await uniswapBot(
 				tradingFirst,
 				tradingSecond,
 				botName,
@@ -162,11 +149,13 @@ router.post('/bot-config', async (req, res) => {
 				mode,
 				botStyle,
 				refreshTime,
-				coolTime
+				coolTime,
+				maxAmount,
+				swapAmount
 			)
 		}
 
-		return true;
+		return res.send({ msg: 'success' });
 
 	} catch (error) {
 		console.error('Error verifying KuCoin API credentials:', error.message);
