@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 import MarketPrice from '../models/marketPrice.js';
 import fetchMarketData from './fetchOrder.js';
 import Bot from '../models/bot.js'
-import contractRun from "./contractFunc.js";
+// import contractRun from "./contractFunc.js";
 
 dotenv.config()
 
@@ -61,8 +61,8 @@ const runningBot = async (botSelect, first, second, id) => {
         const askPrice = condition.info.token1Price * (1 + spreadVal * 1)
 
         // const res = await swapContract(sizeVal)
-        const res = await contractRun(0.003, 10)
-        console.log('uniswap router contrct router-->', res);
+        // const res = await contractRun(0.003, 10)
+        // console.log('uniswap router contrct router-->', res);
 
 
         // placeOrder(first, "buy", bidPrice, sizeVal)

@@ -2,7 +2,22 @@
 import Bot from '../models/bot.js'
 import axios from 'axios';
 
-const uniswapBot = async (symbol1, symbol2, botName, size, profit, spread, trading, connector, mode, botStyle, refreshTime, coolTime) => {
+const uniswapBot = async (
+    symbol1,
+    symbol2,
+    botName,
+    size,
+    profit,
+    spread,
+    trading,
+    connector,
+    mode,
+    botStyle,
+    refreshTime,
+    coolTime,
+    maxAmount,
+    swapAmount
+) => {
 
     const query = `
     	{
@@ -39,10 +54,11 @@ const uniswapBot = async (symbol1, symbol2, botName, size, profit, spread, tradi
         connector: connector,
         mode: mode,
         botStyle: botStyle,
+        maxAmount: maxAmount,
+        swapAmount: swapAmount,
         info: saveData
     })
 
-    console.log("savedata -->", saveData);
     await bot.save()
 }
 

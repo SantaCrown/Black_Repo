@@ -84,7 +84,6 @@ function Strategies() {
                   <td>
                     {item?.mode}
                   </td>
-
                 </tr>
               ))
             }
@@ -97,9 +96,9 @@ function Strategies() {
   return (
     <div className="stratiges">
       {isconfig && <PopOut className="config-popin" component={<StrategiesDetails />} />}
-      <h2 className="heading-top">
+      <h2 className="flex justity-center heading-top">
         Strategies{" "}
-        <span>
+        <span className='flex items-center justify-center'>
           {<DropDownSelect options={options} />}{" "}
           <InputType type="text" placeholder="Search" />
         </span>
