@@ -197,8 +197,9 @@ router.post('/bot-start', async (req, res) => {
 		const tradingPairFirst = Object.keys(selectBot[0].trading)[0].toUpperCase()
 		const tradingPairSecond = Object.keys(selectBot[0].trading)[1].toUpperCase()
 		const id = selectBot[0]._id
-		runningBot(botSelect, tradingPairFirst, tradingPairSecond, id)
-		return res.send({ msg: "Order success!!!!!!!" })
+		// const response =
+		 await runningBot(botSelect, tradingPairFirst, tradingPairSecond, id)
+		// return res.send({ msg: "Order success!!!!!!!", text: response })
 	}
 })
 

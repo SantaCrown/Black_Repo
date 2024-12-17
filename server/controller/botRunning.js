@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import MarketPrice from '../models/marketPrice.js';
 import fetchMarketData from './fetchOrder.js';
 import Bot from '../models/bot.js'
+import { swapTokenForExactToken } from "./v2/scripts/swap.js";
 // import contractRun from "./contractFunc.js";
 
 dotenv.config()
@@ -59,6 +60,46 @@ const runningBot = async (botSelect, first, second, id) => {
         const sizeVal = condition.size
         const bidPrice = condition.info.token1Price * (1 - spreadVal * 1)
         const askPrice = condition.info.token1Price * (1 + spreadVal * 1)
+        const currentPrice = condition.info.token1Price
+        const tokenA = first
+        const tokenB = second
+        const swapMaxSize = condition.maxAmount
+        const swapAmount = condition.swapAmount
+
+        console.log('currentPrice -->', currentPrice);
+
+        if (swapMaxSize > swapAmount) {
+
+            if (currentPrice > 4000) {
+                await swapTokenForExactToken(
+                    tokenA,
+                    tokenB,
+                    swapMaxSize,
+                    swapAmount
+                )
+                return `${tokenA} to ${tokenB} swap success!`
+
+            } else if (currentPrice < 3900) {
+
+                const tokenA1 = '0xB6A1743DC31507F181b12E7742Ae100Bb1f13878'
+                const tokenB1 = '0x397Fb50090C910Bc9d4624a7F211f1bB2100fd45'
+                const swapMaxSize1 = '700'
+                const swapAmount1 = '500'
+
+                await swapTokenForExactToken(
+                    tokenA1,
+                    tokenB1,
+                    swapMaxSize1,
+                    swapAmount1
+                )
+                return `${tokenB} to ${tokenA} swap success!`
+            } else {
+                console.log('success');
+
+            }
+
+        }
+
 
         // const res = await swapContract(sizeVal)
         // const res = await contractRun(0.003, 10)

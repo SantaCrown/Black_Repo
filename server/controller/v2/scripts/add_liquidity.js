@@ -2,10 +2,10 @@ import { ethers } from "ethers"
 import { Token } from "@uniswap/sdk-core"
 import { Pair } from "@uniswap/v2-sdk"
 
-import { SEPOLIA_CHAIN_ID, MAINNET_CHAIN_ID } from "../constants"
-import { ROUTER_ABI, ERC20_ABI, UNISWAP_ROUTER_ABI } from "../abi"
-import { getProvider, getWallet } from "../providers"
-import { CurrentConfig } from "../config"
+import { SEPOLIA_CHAIN_ID, MAINNET_CHAIN_ID } from "../constants.js"
+import { ERC20_ABI, UNISWAP_ROUTER_ABI, ROUTER_ABI } from "../abi.js"
+import { getProvider, getWallet } from "../providers.js"
+import { CurrentConfig } from "../config.js"
 
 const v2RouterAddress = CurrentConfig.env == 'Mainnet'
   ? '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'
