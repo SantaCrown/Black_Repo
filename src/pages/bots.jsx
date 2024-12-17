@@ -136,6 +136,9 @@ function Bots() {
 
   const botStart = async (id) => {
     const response = await axios.post('http://localhost:5000/api/bot-start', { id })
+    
+    console.log('response-->', response?.data);
+    
     if (response?.data?.msg) setPopmsg(response?.data?.msg)
     setState(!state)
   }
@@ -144,6 +147,7 @@ function Bots() {
     const response = await axios.post('http://localhost:5000/api/bot-stop', { id })
     setState(!state)
   }
+
   const getBotAccount = async () => {
     const response = await axios.get('http://localhost:5000/api/bot-get')
     setGetBotInfo(response.data)

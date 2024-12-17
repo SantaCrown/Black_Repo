@@ -2,11 +2,11 @@ import { ethers } from "ethers"
 import { Token } from "@uniswap/sdk-core"
 import { Pair } from "@uniswap/v2-sdk"
 
-import { ERC20_ABI, ROUTER_ABI, UNISWAP_ROUTER_ABI } from "../abi"
-import { getProvider, getWallet } from "../providers"
-import { CurrentConfig, TO_ADDRESS } from "../config"
+import { ERC20_ABI, ROUTER_ABI, UNISWAP_ROUTER_ABI } from "../abi.js"
+import { getProvider, getWallet } from "../providers.js"
+import { CurrentConfig, TO_ADDRESS } from "../config.js"
 
-import { SEPOLIA_CHAIN_ID, MAINNET_CHAIN_ID } from "../constants"
+import { SEPOLIA_CHAIN_ID, MAINNET_CHAIN_ID } from "../constants.js"
 
 const v2RouterAddress = CurrentConfig.env == 'Mainnet'
   ? '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'
@@ -28,6 +28,7 @@ export async function swapTokenForExactToken(
   console.log('token0 address: ', token0Address)
   console.log('token1 address: ', token1Address)
 
+
   const token0Contract = new ethers.Contract(token0Address, ERC20_ABI, getWallet())
   const token1Contract = new ethers.Contract(token1Address, ERC20_ABI, getWallet())
 
@@ -37,7 +38,6 @@ export async function swapTokenForExactToken(
   const token0DecimalsNumber = Number(token0Decimals)
   const token1DecimalsNumber = Number(token1Decimals)
 
-  // TODO: Change chain ID on Mainnet
   const token0 = new Token(SEPOLIA_CHAIN_ID, token0Address, token0DecimalsNumber)
   const token1 = new Token(SEPOLIA_CHAIN_ID, token1Address, token1DecimalsNumber)
 
@@ -101,7 +101,7 @@ export async function swapTokenForExactToken(
     console.log('-----------------------------');
     console.log('tx-->', tx);
     console.log('-----------------------------');
-    
+
     // Wait for the transaction to be mined
     const receipt = await tx.wait();
     console.log("Transaction mined. Receipt:", receipt);
