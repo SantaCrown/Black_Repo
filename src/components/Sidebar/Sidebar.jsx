@@ -45,16 +45,16 @@ function Sidebar({ menuState }) {
       icon: <IconStratiges />,
       link: "/strategies",
     },
-    {
-      name: "Markets",
-      icon: <Market />,
-      link: "/markets",
-    },
-    {
-      name: "Configurations",
-      icon: <Setting />,
-      link: "/configurations",
-    },
+    // {
+    //   name: "Markets",
+    //   icon: <Market />,
+    //   link: "/markets",
+    // },
+    // {
+    //   name: "Configurations",
+    //   icon: <Setting />,
+    //   link: "/configurations",
+    // },
   ];
   return (
     <div className={`side-bar ${menuState ? "open" : ''}`}>

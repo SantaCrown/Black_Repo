@@ -98,8 +98,18 @@ export async function addLiquidity(token0Address, token1Address,
     )
 
     await tx.wait()
+    console.log('-----------------------');
+    console.log('pair address', pairAddress);
+
+    console.log('transation-->', tx?.hash);
+    console.log('-----------------------');
+
     console.log("Liquidity added successfully")
-    return 'success!'
+    return ({
+      hash: tx?.hash,
+      pairAddress: pairAddress,
+      msg: 'success!!'
+    })
 
   } catch (error) {
     console.log('Error adding liquidity ', error)

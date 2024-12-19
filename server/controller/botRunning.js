@@ -61,56 +61,55 @@ const runningBot = async (botSelect, first, second, id) => {
         const bidPrice = condition.info.token1Price * (1 - spreadVal * 1)
         const askPrice = condition.info.token1Price * (1 + spreadVal * 1)
         const currentPrice = condition.info.token1Price
-        const tokenA = first
-        const tokenB = second
+
+        let tokenA, tokenB;
+
+        switch (first) {
+            case 'ETH': tokenA = process.env.TOKEN_ETH_ADDRESS; break;
+            case 'XRP': tokenA = process.env.TOKEN_XRP_ADDRESS; break;
+            case 'BCT': tokenA = process.env.TOKEN_BCT_ADDRESS; break;
+            case 'USDT': tokenA = process.env.TOKEN_USDT_ADDRESS; break;
+        }
+
+        switch (second) {
+            case 'ETH': tokenB = process.env.TOKEN_ETH_ADDRESS; break;
+            case 'XRP': tokenB = process.env.TOKEN_XRP_ADDRESS; break;
+            case 'BCT': tokenB = process.env.TOKEN_BCT_ADDRESS; break;
+            case 'USDT': tokenB = process.env.TOKEN_USDT_ADDRESS; break;
+        }
+
         const swapMaxSize = condition.maxAmount
         const swapAmount = condition.swapAmount
 
-        console.log('currentPrice -->', currentPrice);
+        const response = await swapTokenForExactToken(
+            tokenA,
+            tokenB,
+            swapMaxSize,
+            swapAmount
+        )
 
-        if (swapMaxSize > swapAmount) {
+        console.log('---------');
+        console.log('response-->', response);
+        console.log('---------');
 
-            if (currentPrice > 4000) {
-                await swapTokenForExactToken(
-                    tokenA,
-                    tokenB,
-                    swapMaxSize,
-                    swapAmount
-                )
-                return `${tokenA} to ${tokenB} swap success!`
-
-            } else if (currentPrice < 3900) {
-
-                const tokenA1 = '0xB6A1743DC31507F181b12E7742Ae100Bb1f13878'
-                const tokenB1 = '0x397Fb50090C910Bc9d4624a7F211f1bB2100fd45'
-                const swapMaxSize1 = '700'
-                const swapAmount1 = '500'
-
-                await swapTokenForExactToken(
-                    tokenA1,
-                    tokenB1,
-                    swapMaxSize1,
-                    swapAmount1
-                )
-                return `${tokenB} to ${tokenA} swap success!`
-            } else {
-                console.log('success');
-
-            }
-
+        if (response) {
+            return response
+        } else {
+            return false
         }
-
-
-        // const res = await swapContract(sizeVal)
-        // const res = await contractRun(0.003, 10)
-        // console.log('uniswap router contrct router-->', res);
-
-
-        // placeOrder(first, "buy", bidPrice, sizeVal)
-        // placeOrder(first, "sell", askPrice, sizeVal)
-
-        // return true;
     }
+
+
+    // const res = await swapContract(sizeVal)
+    // const res = await contractRun(0.003, 10)
+    // console.log('uniswap router contrct router-->', res);
+
+
+    // placeOrder(first, "buy", bidPrice, sizeVal)
+    // placeOrder(first, "sell", askPrice, sizeVal)
+
+    // return true;
+    // }
 }
 
 export default runningBot
