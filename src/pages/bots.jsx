@@ -28,6 +28,10 @@ function Bots() {
   const [getBotInfo, setGetBotInfo] = useState(null)
   const [runBot, setRunBot] = useState(null)
   const [state, setState] = useState(true)
+  const [hash, setHash] = useState(null)
+  let infoData = [];
+
+
   // const handleClick = () => {
   //   setButtonOpen(!buttonOpen)
   // }
@@ -134,19 +138,9 @@ function Bots() {
   //   setRunAcc(data.value);
   // }
 
-  const botStart = async (id) => {
-    const response = await axios.post('http://localhost:5000/api/bot-start', { id })
-    
-    console.log('response-->', response?.data);
-    
-    if (response?.data?.msg) setPopmsg(response?.data?.msg)
-    setState(!state)
-  }
+  
 
-  const botStop = async (id) => {
-    const response = await axios.post('http://localhost:5000/api/bot-stop', { id })
-    setState(!state)
-  }
+  let average = true;
 
   const getBotAccount = async () => {
     const response = await axios.get('http://localhost:5000/api/bot-get')
@@ -166,14 +160,32 @@ function Bots() {
     getBotAccount()
   }, [state])
 
-  console.log('getbotinfo', getBotInfo);
-
-  let infoData = [];
   getBotInfo?.map((item, key) => {
     return infoData[key] = item.info
   })
-  console.log('botaccount-->', infoData);
 
+
+  const botStart = async (id) => {
+    const response = await axios.post('http://localhost:5000/api/bot-start', { id })
+
+    console.log('response-->', response?.data);
+    setHash(response?.data.text)
+
+    if (response?.data?.msg) setPopmsg(response?.data?.msg)
+    setState(!state)
+  }
+
+  const botStop = async (id) => {
+    const response = await axios.post('http://localhost:5000/api/bot-stop', { id })
+    setState(!state)
+  }
+
+  useEffect(() => {
+    setTimeout(() => {
+      setHash('')
+      setPopmsg('')
+    }, 10000)
+  }, [hash, popmsg])
 
   return (
     <div className="bots bot-run mt-10">
@@ -181,6 +193,21 @@ function Bots() {
       <h2 className="heading-top">
         Bot Control
       </h2>
+      <div>
+        {
+          hash ? (
+            <div className='text-center text-white text-lg'>
+              Transaction Success! <br />
+              <a target='_blank' href={`https://sepolia.etherscan.io/tx/${hash}`} className='text-white hover:cursor-point hover:text-green-500'>
+                {`https://sepolia.etherscan.io/tx/${hash}`}
+              </a>
+            </div>
+          )
+            : (
+              <div></div>
+            )
+        }
+      </div>
       <div className='mt-10'>
         <div className='mt-5'>
           <table className='w-full text-center text-white'>
@@ -223,9 +250,7 @@ function Bots() {
                           Start
                         </Button>
                       )}
-
                     </td>
-
                   </tr>
                 ))
               }
@@ -233,10 +258,11 @@ function Bots() {
           </table>
         </div>
       </div>
-      <div>
+
+      <div className='text-white text-xl mt-10'>
         Bot Details :
       </div>
-      <div className='grid grid-cols-2 gap-5 justify-between'>
+      <div className='grid grid-cols-2 gap-5 justify-between mt-2'>
         {
 
           infoData &&
@@ -261,11 +287,11 @@ function Bots() {
                 </tr>
                 <tr>
                   <td className='p-1 border-[1px] border-white'>Token0Price : </td>
-                  <td className='p-1 border-[1px] border-white'>{Number(ele?.token0Price).toFixed(4)}  {ele?.token1.symbol } / { ele?.token0.symbol }</td>
+                  <td className='p-1 border-[1px] border-white'>{Number(ele?.token0Price).toFixed(4)}  {ele?.token1.symbol} / {ele?.token0.symbol}</td>
                 </tr>
                 <tr>
                   <td className='p-1 border-[1px] border-white'>Token1price : </td>
-                  <td className='p-1 border-[1px] border-white'>{Number(ele?.token1Price).toFixed(1)} {ele?.token0.symbol } / { ele?.token1.symbol }</td>
+                  <td className='p-1 border-[1px] border-white'>{Number(ele?.token1Price).toFixed(1)} {ele?.token0.symbol} / {ele?.token1.symbol}</td>
                 </tr>
                 <tr>
                   <td className='p-1 border-[1px] border-white'>VolumnUSO :</td>

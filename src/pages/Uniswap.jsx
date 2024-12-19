@@ -3,109 +3,81 @@ import axios from 'axios'
 import { useSelector } from "react-redux";
 import { addLiquidity } from "../v2/scripts/add_liquidity";
 import { swapTokenForExactToken } from "../v2/scripts/swap";
+import Popmsg from "../uielement/Popmsg";
 
 const Uniswap = () => {
   const account = useSelector((state) => state.swap.account);
   const [userAccount, setUserAccount] = useState(account)
   const userAddress = userAccount.getAccount().address
+  const [popmsg, setPopMsg] = useState('')
+  const [error, setError] = useState(null);
+  const [hash, setHash] = useState(null)
+  const [pairAddress, setPairAddress] = useState(null)
+  const [msg, setMsg] = useState('')
+  const [state, setState] = useState(true)
 
-  const [token0AddressForSwap, setToken0AddressForSwap] = useState('')
-  const [token1AddressForSwap, setToken1AddressForSwap] = useState('')
-  const [token0MaxAmount, setToken0MaxAmount] = useState()
-  const [token1AmountToBuy, setToken1AmountToBuy] = useState()
-
-  const handleSwap = async () => {
-    await swapTokenForExactToken(
-      token0AddressForSwap,
-      token1AddressForSwap,
-      token0MaxAmount,
-      token1AmountToBuy
-    )
-  }
-
-  // add liquidity part
+  console.log('----');
+  console.log('msg-->', msg);
+  console.log('----');
 
   const [token0AddressForAddingLiquidity, setToken0AddressForAddingLiquidity] = useState("");
   const [token1AddressForAddingLiquidity, setToken1AddressForAddingLiquidity] = useState("");
   const [token0AmountForAddingLiquidity, setToken0AmountForAddingLiquidity] = useState();
   const [token1AmountForAddingLiquidity, setToken1AmountForAddingLiquidity] = useState();
 
-  const [msg, setMsg] = useState('')
-  const [state, setState] = useState(true)
+  let tokenA, tokenB;
 
+  switch (token0AddressForAddingLiquidity) {
+    case 'ETH': tokenA = '0x397Fb50090C910Bc9d4624a7F211f1bB2100fd45'; break;
+    case 'XRP': tokenA = '0xeD055569c252f569B3f1C3f0559a7A8cd9CB2B42'; break;
+    case 'BCT': tokenA = '0xB6A1743DC31507F181b12E7742Ae100Bb1f13878'; break;
+    case 'USDT': tokenA = '0x68143aEE5344CF0C5CdE599f16d18951D4b69Ea9'; break;
+  }
+
+  switch (token1AddressForAddingLiquidity) {
+    case 'ETH': tokenB = '0x397Fb50090C910Bc9d4624a7F211f1bB2100fd45'; break;
+    case 'XRP': tokenB = '0xeD055569c252f569B3f1C3f0559a7A8cd9CB2B42'; break;
+    case 'BCT': tokenB = '0xB6A1743DC31507F181b12E7742Ae100Bb1f13878'; break;
+    case 'USDT': tokenB = '0x68143aEE5344CF0C5CdE599f16d18951D4b69Ea9'; break;
+  }
   const handleAddLiquidity = async () => {
     const res = await addLiquidity(
-      token0AddressForAddingLiquidity,
-      token1AddressForAddingLiquidity,
+      tokenA,
+      tokenB,
       token0AmountForAddingLiquidity,
       token1AmountForAddingLiquidity
     )
     console.log('addrequidty -->res', res);
     setMsg(res)
-  }
-
-  const [tokenId, setTokenId] = useState("");
-  const [liquidity, setLiquidity] = useState("");
-
-  const removeLiquidity = async () => {
-    const response = await axios.post("http://localhost:5000/api/remove-liquidity", {
-      tokenId,
-      liquidity
-    })
+    setHash(res?.hash)
+    setPairAddress(res?.pairAddress)
+    setPopMsg(res?.msg)
   }
 
   return (
     <div>
-      <div className="text-center text-white mt-10 mb-5">
-        this is the uniswap page
-      </div>
+      {popmsg && <Popmsg className={error ? "error" : ""}>{popmsg}</Popmsg>}
 
-      <div className="flex flex-col gap-2 ">
-        <input
-          className='text-white border-[1px] border-white rounded-md bg-black'
-          type="text"
-          value={token0AddressForSwap}
-          onChange={(e) => setToken0AddressForSwap(e.target.value)}
-          name=""
-          id=""
-        />
-        <input
-          className='text-white border-[1px] border-white rounded-md bg-black'
-          type="text"
-          value={token1AddressForSwap}
-          onChange={(e) => setToken1AddressForSwap(e.target.value)}
-          name=""
-          id=""
-        />
-        <input
-          className='text-white border-[1px] border-white rounded-md bg-black'
-          type="number"
-          value={token0MaxAmount}
-          onChange={(e) => setToken0MaxAmount(e.target.value)}
-          name=""
-          id=""
-        />
-        <input
-          className='text-white border-[1px] border-white rounded-md bg-black'
-          type="text"
-          value={token1AmountToBuy}
-          onChange={(e) => setToken1AmountToBuy(e.target.value)}
-          name=""
-          id=""
-        />
-        <button
-          onClick={handleSwap}
-          className=" text-white border-[1px] border-green-500"
-        >
-          swap
-        </button>
+      {
+        msg ?
+          (
+            <div className="text-center text-white text-xl mt-10">
+              <a target='_blank' href={`https://sepolia.etherscan.io/tx/${hash}`} className='text-white hover:cursor-point hover:text-green-500'>
+                {`https://sepolia.etherscan.io/tx/${hash}`}
+              </a>
+              {/* <a href={`https;//`} target="_blank" className="hover:text-green">{msg?.hash}</a> */}
+              <p>pairAddress : {pairAddress}</p>
+            </div>
+          ) : (
+            <div>
 
-      </div>
-
-
+            </div>
+          )
+      }
       <div className="text-white text-center mt-10 mb-5">
         Provideing Liquidity
       </div>
+
       <div className="flex flex-col gap-2 ">
         <input
           className='text-white border-[1px] border-white rounded-md bg-black'
@@ -137,16 +109,7 @@ const Uniswap = () => {
         />
         <button onClick={handleAddLiquidity} className=" text-white border-[1px] border-green-500" >Add Liquidity</button>
       </div>
-
-
-      <div className="text-white text-center mt-10 mb-5">
-        remove liquidity
-      </div>
-      <div className="flex flex-col gap-2 ">
-        <input className='text-white border-[1px] border-white rounded-md bg-black' type="text" value={tokenId} onChange={(e) => setTokenId(e.target.value)} placeholder="Token ID" />
-        <input className='text-white border-[1px] border-white rounded-md bg-black' type="text" value={liquidity} onChange={(e) => setLiquidity(e.target.value)} placeholder="Liquidity Amount" />
-        <button onClick={removeLiquidity} className=" text-white border-[1px] border-green-500" >Remove Liquidity</button>
-      </div>
+      
     </div>
   )
 }

@@ -111,7 +111,7 @@ export async function swapTokenForExactToken(
     console.log("Gas Used:", receipt.gasUsed.toString());
     console.log("Swapped successfully")
 
-    return true
+    return tx.hash
 
   } catch (error) {
     console.error('Error getting swap transaction:', error)
