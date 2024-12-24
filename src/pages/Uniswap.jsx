@@ -74,42 +74,48 @@ const Uniswap = () => {
             </div>
           )
       }
-      <div className="text-white text-center mt-10 mb-5">
-        Provideing Liquidity
+       <div className="flex flex-col w-full p-[20px] bg-[#000000] rounded-lg swapContainer">
+      <div className="text-[#FEF200] font-bold text-[25px] text-left mb-5">
+       <h1> Provideing Liquidity </h1>
       </div>
 
       <div className="flex flex-col gap-2 ">
+
+        <div className="flex flex-col md:flex-row gap-2 py-3 input-feild">
         <input
-          className='text-white border-[1px] border-white rounded-md bg-black'
+          className='text-white border-[1px] border-white rounded-md bg-black py-3 w-full md:w-[50%] pl-0'
           type="text"
           value={token0AddressForAddingLiquidity}
           onChange={(e) => setToken0AddressForAddingLiquidity(e.target.value)}
           placeholder="Token A Address"
         />
         <input
-          className='text-white border-[1px] border-white rounded-md bg-black'
+        className='text-white border-[1px] border-white rounded-md bg-black py-3 px-2 w-full md:w-[50%] pl-0'
           type="text"
           value={token1AddressForAddingLiquidity}
           onChange={(e) => setToken1AddressForAddingLiquidity(e.target.value)}
           placeholder="Token B Address"
         />
+        </div>
+        <div className="flex flex-col md:flex-row gap-2 py-3 input-feild">
         <input
-          className='text-white border-[1px] border-white rounded-md bg-black'
+       className='text-white border-[1px] border-white rounded-md bg-black py-3 px-2 w-full md:w-[50%] pl-0'
           type="number"
           value={token0AmountForAddingLiquidity}
           onChange={(e) => setToken0AmountForAddingLiquidity(e.target.value)}
           placeholder="Amount of Token A"
         />
         <input
-          className='text-white border-[1px] border-white rounded-md bg-black'
+          className='text-white border-[1px] border-white rounded-md bg-black py-3 px-2 w-full md:w-[50%] pl-0'
           type="number"
           value={token1AmountForAddingLiquidity}
           onChange={(e) => setToken1AmountForAddingLiquidity(e.target.value)}
           placeholder="Amount of Token B"
         />
-        <button onClick={handleAddLiquidity} className=" text-white border-[1px] border-green-500" >Add Liquidity</button>
+        </div>
+        <button onClick={handleAddLiquidity} className=" border-[1px] border-green-500 default-btn login-btn mt-[20px] text-[#000000]"  >Add Liquidity</button>
       </div>
-      
+      </div>
     </div>
   )
 }
