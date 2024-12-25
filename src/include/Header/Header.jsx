@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Link } from "react-router-dom";
 import { getImgURL } from "../../util/image-util";
 import { MenuIcon } from "../../icons/icons";
 import LogoutButton from "../../components/LogoutButton";
+import { useState } from "react";
 import {
   EthereumClient,
   w3mConnectors,
@@ -13,7 +14,7 @@ import {
 import { Web3Modal } from "https://unpkg.com/@web3modal/html@2.6.2";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setAccount } from "../../redux/slices/swapSlice";
+import { setAccount, setValue } from "../../redux/slices/swapSlice";
 
 const { bsc } = WagmiCoreChains;
 const { configureChains, createConfig, getAccount, readContract, fetchBalance, sendTransaction } = WagmiCore;
@@ -36,9 +37,7 @@ const wagmiConfig = createConfig({
 });
 
 let ethereumClient = new EthereumClient(wagmiConfig, chains);
-
-console.log('ethereumClient-->', ethereumClient);
-
+let walletAddress = ethereumClient.getAccount().address
 
 
 export const web3Modal = new Web3Modal(
@@ -51,42 +50,37 @@ export const web3Modal = new Web3Modal(
   ethereumClient
 )
 
-// async function getWalletBalance() {
-
-
-//   try {
-//     // Get the connected account
-//     const account = getAccount();
-//     console.log('header accout', account);
-
-//     if (!account.isConnected) {
-//       console.log("Wallet not connected");
-//       return;
-//     }
-
-//     const walletAddress = account.address;
-
-//     // Fetch the wallet balance
-//     const balance = await fetchBalance({
-//       address: walletAddress, // Connected wallet address
-//       chainId: bsc.id,        // Specify the chain ID
-//     });
-
-//     console.log(`Wallet Address: ${walletAddress}`);
-//     console.log(`Balance: ${balance.formatted} ${balance.symbol}`);
-//     return { walletAddress, balance: `${balance.formatted} ${balance.symbol}` };
-//   } catch (error) {
-//     console.error("Error fetching wallet balance:", error);
-//   }
-// }
-
 const Header = ({ hendlmobilemenu }) => {
   const dispatch = useDispatch()
   dispatch(setAccount(ethereumClient))
 
-  // useEffect(()=> {
-  //   getWalletBalance()
-  // }, [])
+  const [balances, setBalances] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  async function getBalances(walletAddress) {
+    const chainId = 1; // Ethereum Mainnet
+    const apiKey = "cqt_rQKFf4yBj6BX8fKKKh76YFv6b3bm";
+
+    const response = await fetch(
+      `https://api.covalenthq.com/v1/${chainId}/address/${walletAddress}/balances_v2/?key=${apiKey}`
+    );
+
+    const data = await response.json();
+
+    const res = data.data.items.map((item) => ({
+      name: item.contract_name,
+      symbol: item.contract_ticker_symbol,
+      balance: item.balance / Math.pow(10, item.contract_decimals),
+      price: item.quote_rate
+    }));
+    setBalances(res)
+  }
+
+  dispatch(setValue(balances))
+
+  useEffect(() => {
+    getBalances(walletAddress);
+  }, [])
 
   return (
     <Router>

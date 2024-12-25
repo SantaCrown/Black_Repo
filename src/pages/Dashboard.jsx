@@ -6,7 +6,17 @@ import CandleChart from "../components/CandleChart/CandleChart";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import TradingView from "../components/TradingView/TradingView";
+import { useSelector } from "react-redux";
+
 function Dashboard() {
+
+  const value = useSelector((state) => state.swap.value);
+
+  console.log('---------');
+  console.log('dashboard', value);
+  console.log('---------');
+  
   const InfoIco = Info;
   const EthIco = Eth;
   const TetherIco = Tether;
@@ -40,34 +50,27 @@ function Dashboard() {
   }, [state])
 
   useEffect(() => {
-    // Get token from query params
     const params = new URLSearchParams(window.location.search);
-    // const token = params.get('token');
     if (params.get('token')) {
       setToken(params.get('token'));
-      // Store the token in localStorage
       localStorage.setItem('token', params.get('token'));
-
-      // Clear the query parameter from the URL
       window.history.replaceState(null, '', window.location.pathname);
-      window.location.href = '/dashboard'; // Redirect after login
-
+      window.location.href = '/dashboard';
     } else if (localStorage.getItem('token')) {
-      // navigate('/dashboard')
       setToken(localStorage.getItem('token'));
-
     } else {
-      // Redirect to login if token is missing
       navigate('/login');
     }
   }, [navigate, token]);
 
   return (
-    <div>
+    <div className="h-screen w-full">
       <h2 className="heading-top">Dashboard</h2>
-      <div className="conatiner-grid cards">
-
-        <Card heading="Bots" className = 'relative'>
+      <div className="h-[500px] w-full">
+        <TradingView />
+      </div>
+      <div className="conatiner-grid cards mt-10">
+        <Card heading="Bots" className='relative'>
 
           <div className="list-data-bot">
             {
@@ -89,56 +92,6 @@ function Dashboard() {
           </div>
           <Button handler={moveTo} className="default-btn" >Explore More Stratiges</Button>
         </Card>
-
-        <Card heading="Monthly (P&L)" >
-          <CandleChart />
-        </Card>
-
-        <Card heading="Balances">
-          <div className="table-bar">
-            <div className="head">
-              <p>Token</p>
-              <p>Doller Value</p>
-            </div>
-            <div className="head heading">
-              <p>Local Wallet</p>
-
-            </div>
-            <div className="head data">
-              <div>
-                <p>232.65 ETH</p>
-                <p>$81466.16</p>
-              </div>
-              <div>
-                <p>232.65 ETH</p>
-                <p>$81466.16</p>
-              </div>
-              <div>
-                <p>232.65 ETH</p>
-                <p>$81466.16</p>
-              </div>
-            </div>
-            <div className="head heading">
-              <p>BINANCE</p>
-
-            </div>
-            <div className="head data">
-              <div>
-                <p>232.65 ETH</p>
-                <p>$81466.16</p>
-              </div>
-              <div>
-                <p>232.65 ETH</p>
-                <p>$81466.16</p>
-              </div>
-              <div>
-                <p>232.65 ETH</p>
-                <p>$81466.16</p>
-              </div>
-            </div>
-          </div>
-        </Card>
-
         <Card heading="Your Portfolio" otherInfo="$12544.44">
           <div className="tokens-status">
             <div className="token">
@@ -164,7 +117,6 @@ function Dashboard() {
 
           </div>
         </Card>
-
       </div>
     </div>
   );
