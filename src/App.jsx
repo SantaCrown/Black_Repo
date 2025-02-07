@@ -12,10 +12,7 @@ function App() {
     <>
       <div className="blacklemon-app">
         <Header hendlmobilemenu={hendlmobilemenu} />
-        
-       
         <Main menuState={menu}/>
-       
       </div>
     </>
   );
